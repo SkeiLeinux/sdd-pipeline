@@ -19,11 +19,12 @@ Why before the plan: interfaces are where components and teams meet. Listing the
 ## Do
 
 1. A group per edge domain: `### <edge> - <provider> -> <consumer>`. An edge with no interface work - "No changes: <why>".
-2. One card per operation or kind of exchange: `contracts/CON-NNN-<slug>.md`. Frontmatter: kind (`contract_kinds`), provider, consumers, scope (`in` when we own the provider), mode (`new`, `change`, `reuse`, `external`), status `draft`, requirements - the requirements the operation serves (edge requirements and the node requirements exposed through it).
+2. One card per operation or kind of exchange: `contracts/CON-NNN-<slug>.md`. Frontmatter: kind (`contract_kinds`), provider, consumers, scope (`in` when we own the provider), mode (`new`, `change`, `reuse`, `external`), status `draft` (it becomes `review` when the owners of both sides get it to read), requirements - the in-scope requirements the operation serves (edge requirements and the node requirements exposed through it; a rule for every operation of the edge, such as identity and access, goes on each card). Out-of-scope requirements of the other side are named in the card text, not in `requirements`. Kind - what the source or the other side's documentation implies (`api` for a call, `file`, `message`); nothing to go on - `other` with a marker. The registry `owner` - the passport owner unless the user names another.
 3. Card body: purpose, expected input, expected result, constraints and questions, sources. An existing or external interface - cite its documentation or code; unknown address or schema - a question, never a guess. A new interface - "designed from REQ-NNN"; method, path and full schemas are left to the spec.
 4. Operations of the UI -> API edge - from the "Screen fields" tables: every operation there has a card.
 5. "Requirements without contracts" - every in-scope requirement not linked to a card, with a concrete reason (internal rule, exposed through CON-NNN; screen text, data from CON-NNN).
-6. When the registry is complete: status `review`, passport `status: contracts`, history row.
+6. Open questions that now block a card - add the CON IDs to their `Blocks`.
+7. When the registry is complete: status `review`, passport `status: contracts`, history row.
 
 ## Never
 

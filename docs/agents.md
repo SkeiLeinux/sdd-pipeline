@@ -83,6 +83,15 @@ A useful calibration on a new model: run the same domain twice in fresh sessions
 | Subagent asks permission for every edit | prompts on files in `features/` | path patterns in the wrapper do not match the tool's path format |
 | Loops | the answer grows without progress | stop, narrow the step, new session |
 
+## Field test
+
+The kit was run end to end by fresh agent sessions on a synthetic 120-line BRD with planted traps (two deadlines for one decision, limits "by city" with no list, a status set at two different moments, no currency). Each step got only the repository and the one-line prompt from the cheat sheet. Steps: intake, map, all 10 domains, contracts, plan, one API spec, its review, applying two answers.
+
+- The traps were caught: the map listed them under "Watch:", the domains turned them into questions instead of choosing a side, and only the owner's answer resolved them.
+- Result: 124 requirements, 44 questions, 22 contracts, 29 planned units, 0 checker errors at every step.
+- The review of the spec found real design defects the writer missed (a lock held across remote calls, an open question decided silently, a lost notification after a crash).
+- Each agent reported where the instructions were unclear. Those places were fixed: edge direction, the approval of the map, contradictions, the plan-stage noise of the contracts gate, the reading scope of specs and reviews, new interfaces in answers. The checker gained `link-file`, `q-blocks-marker` and `table-cols`.
+
 ## What not to hand to the agent
 
 Choices between architectures (it may prepare a comparison), resolving contradictions in the source, changing approved specs without the owner, real personal data.

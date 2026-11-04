@@ -475,11 +475,49 @@ def check_decisions(F):
 
 # ====================================================================== checks: references and markers
 
+# Pipeline files linked from templates before the step that creates them exists.
+LATER_FILES = ("analysis.md", "requirements/README.md", "contracts/README.md", "traceability.md")
+LINK_RE = re.compile(r"\]\(([^)\s]+)\)")
+
+
+def _check_file_links(F, path, lines):
+    cmask = sddlib.code_mask(lines)
+    hmask = sddlib.comment_mask(lines, cmask)
+    base = os.path.dirname(path)
+    for i, line in enumerate(lines):
+        if cmask[i] or hmask[i]:
+            continue
+        for target in LINK_RE.findall(re.sub(r"`[^`]*`", "", line)):
+            if re.match(r"^[a-z][a-z0-9+.-]*:", target, re.I) or target.startswith("#") or "<" in target:
+                continue
+            full = os.path.normpath(os.path.join(base, target.split("#")[0]))
+            if os.path.exists(full):
+                continue
+            relt = os.path.relpath(full, F.dir).replace("\\", "/")
+            if re.match(r"specs/[^/]+\.md$", relt) or (relt in LATER_FILES and F.stage < STAGES.index("ready")):
+                continue  # planned specs are reported by link-spec
+            F.add("W", path, "link-file", "link target %s does not exist" % target, i)
+
+
+def _check_table_shape(F, path, lines, relp_is_reqs):
+    for t in sddlib.tables(lines):
+        n = len(t["header"])
+        if relp_is_reqs and n == 7:
+            continue  # requirement tables are checked by req-cols
+        for ln, cells in t["rows"]:
+            if len(cells) != n:
+                F.add("W", path, "table-cols", "row has %d cells, the header has %d - a missing or extra '|'"
+                      % (len(cells), n), ln)
+
+
 def check_links(F):
     for path in F.md_files():
         if F.is_source(path) or os.path.basename(path) == "traceability.md":
             continue
         lines = sddlib.read_lines(path)
+        _check_file_links(F, path, lines)
+        _check_table_shape(F, path, lines, relp_is_reqs=os.path.relpath(path, F.dir).replace("\\", "/")
+                           .startswith("requirements/"))
         relp = os.path.relpath(path, F.dir).replace("\\", "/")
         is_spec = relp.startswith("specs/")
         approved = False
@@ -507,6 +545,19 @@ def check_links(F):
             for sid in sddlib.ids_in(line, "SPEC"):
                 if F.plan and sid not in F.plan:
                     F.add("W", path, "link-spec", "%s is not in the spec plan" % sid, i)
+
+
+def check_blocks_markers(F):
+    """An open question that blocks a requirement must be visible at that requirement."""
+    for qid, q in F.questions.items():
+        if q["fields"].get("status", ("", 0))[0] not in ("open", "answered"):
+            continue
+        blocks = q["fields"].get("blocks", ("", 0))[0]
+        for rid in sddlib.ids_in(blocks, "REQ"):
+            r = F.reqs.get(rid)
+            if r and ("[?%s]" % qid) not in (r["text"] + r["note"]):
+                F.add("W", r["path"], "q-blocks-marker", "%s blocks %s, but its row has no marker [?%s]"
+                      % (qid, rid, qid), r["line"])
 
 
 # ====================================================================== checks: contracts
@@ -743,8 +794,8 @@ def check_plan(F):
                                                                                       ", ".join(SPEC_STATUSES)), ln)
     elif F.stage >= 3:
         F.add(F.sev("spec"), path, "plan-table", "no section '## Spec plan' in the passport")
-    if F.stage < 3:
-        return
+    if F.stage < 3 or F.gate == "contracts":
+        return  # the contracts gate asks "ready to plan?" - coverage by the plan comes later
     sev = F.sev("spec")
     planned = set()
     for row in F.plan.values():
@@ -1058,6 +1109,7 @@ def check_feature(fdir, root, cfg, report, gate=None):
     check_plan(F)
     check_specs(F)
     check_links(F)
+    check_blocks_markers(F)
     if gate:
         check_gate(F, gate)
     return F

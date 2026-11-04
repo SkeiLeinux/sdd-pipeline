@@ -12,15 +12,15 @@ Parameters: feature folder and `SPEC-NN`. Not in the plan - stop and suggest `sd
 1. The passport - the plan row of `SPEC-NN`: type, title, component, requirements, contracts.
 2. The rows of those requirements in `requirements/`. For `ui` - the "Screen fields" table of its UI domain; for `scenario` - its row in "Scenarios" of `analysis.md`.
 3. The source sections cited by those requirements - in the slice of the requirement's domain `source/domains/<domain>.md`; only those sections.
-4. `decisions/` - decisions and open questions about these requirements and contracts.
-5. The contract cards from the plan row.
+4. `decisions/` - decisions and open questions about these requirements and contracts. `analysis.md` - "Cross-cutting rules" and "Glossary".
+5. The contract cards from the plan row; of the contracts the algorithm calls (named in those cards) - Purpose, Input and Result.
 6. `templates/spec/<type>.md`; the example of the same type in `examples/LIB-1-book-reservations/specs/` if there is one.
-7. Specs from `depends` and written specs of the same component - only headers and the tables you must agree with (names and types of fields).
+7. Specs from `depends` and written specs of the same component - only headers and the tables you must agree with (names and types of fields). A spec you depend on is not written yet (an API method before the data model) - name the tables, columns or settings you need as "per SPEC-NN, not written yet", add SPEC-NN to `depends`, and list them under places to check.
 8. For `mode: change` - the current description of what changes (code or docs the user pointed to).
 
 ## Do
 
-1. Create `specs/SPEC-NN-<slug>.md` exactly as named in the plan. Frontmatter: values from the plan row, `mode`, `status: draft`, `version: 1`, `depends`, `updated` - today.
+1. Create `specs/SPEC-NN-<slug>.md` exactly as named in the plan. Title - by the template's pattern ("Add POST /claims/{id}/submit"); put the same title into the plan row. Frontmatter: other values from the plan row, `mode`, `status: draft`, `version: 1`, `depends`, `updated` - today.
 2. Fill every section of the template. Not applicable - "Not applicable: <why>".
 3. Design the full contract here: method and path, parameters, schemas, errors, access, with sources; respect the purpose and data of the card and give its version. A new interface - explicit design decisions from requirements; an existing one - only from its documentation or code.
 4. `api-method`: authentication and authorization (including which objects the caller may touch); every request parameter with type, required and constraints; validation as the first steps of the algorithm; the success status code; complete working examples - path with sample values, full request body for methods with a body, full response; a subsection in "Response codes" for every code the algorithm can stop with and for the shared codes that can happen, each with its condition and full body. No "..." except for long values. `api_response_required_keys` in `sdd.config.json` - every response example contains them. Non-functional needs (performance, idempotency, pagination, limits, audit) and compatibility for `mode: change`.
@@ -28,10 +28,10 @@ Parameters: feature folder and `SPEC-NN`. Not in the plan - stop and suggest `sd
 6. `message`: channel, producer and consumers, full payload with example, when it is sent (inside or after which transaction), delivery guarantee, ordering, duplicates, dead letters, versioning.
 7. `ui`: every field and action of the domain's "Screen fields" table; validation messages, confirmations and where actions lead; what the user sees for each error code of the operations.
 8. `job` and `integration`: concurrency and restart, retries, volumes, monitoring.
-9. Algorithms - numbered steps; every value with its source (table and column, contract, configuration key); error branches inside steps; last line "Result: ...".
+9. Algorithms - numbered steps; every value with its source (table and column, contract, configuration key); error branches inside steps, including every remote call (unavailable, timeout, not found); last line "Result: ...". Remote calls before any lock or transaction; access checks before locking; side effects after the commit (notification, message) - how they survive a crash (outbox, retry), or a marker if that is open.
 10. Acceptance criteria - at least one testable statement per header requirement, ending with `(REQ-NNN)`.
-11. Unknowns - `[?Q-NNN]` and a question block; never an invented value. Add a link to this spec in the card's "Detailed spec".
-12. Status of the plan row, if it changed.
+11. Unknowns - `[?Q-NNN]` and a question block; never an invented value. A question's proposal may be used as a provisional value only with its marker, and is listed under places to check. Read only the question blocks you cite, not all of `questions.md`. Add a link to this spec in the card's "Detailed spec"; update the card's `requirements` and the points it left to the spec to what the spec decided.
+12. Status and title of the plan row; passport history row "SPEC-NN written, version N"; requirements of the spec that a cross-cutting rule adds (audit, access) - add them to the header and the plan row.
 
 ## Self-check
 

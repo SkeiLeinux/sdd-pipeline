@@ -98,8 +98,8 @@ def main(argv=None):
             print("stale: source/domains/%s.md" % name)
         print("Slices: %d, stale or missing: %d, errors: %d." % (len(names), len(stale), bad))
         return 1 if (stale or bad) else 0
-    print("Slices: %d, rebuilt: %d (%s), errors: %d." % (len(names), len(written),
-                                                      ", ".join(written) or "-", bad))
+    print("Slices: %d, rebuilt: %d (%s), already up to date: %d, errors: %d." % (
+        len(names), len(written), ", ".join(written) or "-", max(0, len(names) - len(written) - bad), bad))
     return 1 if bad else 0
 
 

@@ -19,7 +19,7 @@ Interfaces of the feature, grouped by edge domains of the [domain map](../analys
 |---|---|---|---|---|---|---|---|
 | [CON-001](CON-001-catalog-availability.md) | api | Catalog system | Reservation service | external | Get available copies of a title per branch | REQ-011, REQ-012 | draft |
 
-### integration-portal-api - Member portal -> Reservation service
+### integration-portal-api - Reservation service -> Member portal
 
 | Contract | Kind | Provider | Consumers | Mode | Operation | Requirements | Status |
 |---|---|---|---|---|---|---|---|
@@ -27,7 +27,7 @@ Interfaces of the feature, grouped by edge domains of the [domain map](../analys
 | [CON-003](CON-003-list-reservations.md) | api | Reservation service | Member portal | new | List the member's reservations | REQ-006, REQ-008, REQ-015 | review |
 | [CON-004](CON-004-cancel-reservation.md) | api | Reservation service | Member portal | new | Cancel a reservation | REQ-007, REQ-016 | review |
 
-### integration-notifications - Reservation service -> Notification gateway
+### integration-notifications - Notification gateway -> Reservation service
 
 | Contract | Kind | Provider | Consumers | Mode | Operation | Requirements | Status |
 |---|---|---|---|---|---|---|---|

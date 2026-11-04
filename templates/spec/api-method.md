@@ -83,8 +83,8 @@ Status: <200 / 201 / 204>.
 ## Response codes
 
 <!-- A subsection "### <code> <message>" for every code the method returns: each error the algorithm stops with,
-     and the shared ones (400, 401, 403, 404, 409, 422, 429, 500, 503 - only those that can happen, unless the house
-     rules describe shared codes elsewhere - then link them). Each: when it happens (step) and the full body. -->
+     and the shared ones (400, 401, 403, 404, 409, 422, 429, 500, 503 - only those that can happen; 500 can always happen;
+     when the house rules describe shared codes elsewhere - link them). Each: when it happens (step) and the full body. -->
 
 ### 400 <Message>
 
@@ -113,7 +113,7 @@ When: step <N>, <condition>.
 
 ## Acceptance criteria
 
-<!-- 3-10 testable statements: condition and observable result, each ending with the requirement it checks.
+<!-- Testable statements, at least one per header requirement and per error code (group related checks in one statement): condition and observable result, each ending with the requirement it checks.
      Cover the success path and every error code. -->
 
 1. <When ..., the method returns ...> (REQ-NNN)

@@ -134,5 +134,7 @@ Output lines look like `E path:line - [code] message`. Groups:
 | `plan-*`, `spec-*`, `scenario-coverage`, `section`, `placeholder`, `template-comment` | plan and spec units |
 | `api-codes`, `api-success`, `api-envelope` | every code the algorithm uses is described with a body; the success code is stated; house envelope |
 | `dm-*` | data model columns, logical types, primary keys |
-| `link-*` | references to things that do not exist |
+| `link-*` | references to things that do not exist; `link-file` - a relative link to a missing file |
+| `q-blocks-marker` | an open question blocks a requirement whose row has no marker of it |
+| `table-cols` | a table row has more or fewer cells than its header |
 | `gate` | gate conditions |

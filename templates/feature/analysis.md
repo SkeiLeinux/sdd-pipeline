@@ -28,11 +28,13 @@ updated: YYYY-MM-DD
 
 ## Solution map
 
-<!-- Optional diagram: nodes are node domains, arrows are edge domains. Dashed - not decided yet, with a question marker. -->
+<!-- Optional diagram: nodes are node domains, arrows are edge domains. Dashed - not decided yet, with a question marker.
+     Arrows and the Component column of edges: provider -> consumer. The provider owns the interface (exposes the API,
+     defines the file or message format, delivers notifications); data may flow either way. -->
 
 ```mermaid
 flowchart LR
-  ui["ui-<screen>"] -->|integration-<exchange>| svc["service-<part>"]
+  svc["service-<part>"] -->|integration-<exchange>| ui["ui-<screen>"]
   ext["<external system>, out of scope"] -->|integration-<exchange>| svc
 ```
 

@@ -55,15 +55,15 @@ Example: `POST /reservations`
 
 1. Take the member ID from the session token. If there is no valid session - stop with error 401.
 2. Check `titleId` and `branchId`: both present, at most 64 characters. Otherwise - stop with error 400.
-3. Count rows of `reservation` (SPEC-02) with this `member_id` and `status` = `active`. If there are 3 or more - stop with error 409 `LIMIT_REACHED` (REQ-002).
-4. Look for a row of `reservation` with this `member_id`, `title_id` and `status` = `active`. If found - stop with error 409 `ALREADY_RESERVED` (REQ-003). Whether the branch is part of this check - [?Q-005].
-5. Ask the catalog for available copies of the title at the branch through CON-001 (SPEC-03). If the catalog does not answer within the timeout of SPEC-03 or answers with an error - stop with error 503 `CATALOG_UNAVAILABLE` (REQ-012). If the number of available copies is 0 - stop with error 409 `NOT_AVAILABLE` (REQ-011).
-6. Save a row of `reservation`: new `id`, `member_id`, `title_id`, `branch_id`, `status` = `active`, `created_at` = now, `valid_until` = now + 3 days (REQ-001, REQ-004). In the same transaction save a `reservation_audit` row with `action` = `created` and `actor` = member ID.
+3. Ask the catalog for available copies of the title at the branch through CON-001 (SPEC-03), outside any transaction. If the catalog does not answer within the timeout of SPEC-03 or answers with an error - stop with error 503 `CATALOG_UNAVAILABLE` (REQ-012). If the number of available copies is 0 - stop with error 409 `NOT_AVAILABLE` (REQ-011).
+4. Open a transaction and lock the member's rows of `reservation` with `status` = `active` (SPEC-02). Count them. If there are 3 or more - stop with error 409 `LIMIT_REACHED` (REQ-002).
+5. Among the same rows look for one with this `title_id`. If found - stop with error 409 `ALREADY_RESERVED` (REQ-003). Whether the branch is part of this check - [?Q-005].
+6. Save a row of `reservation`: new `id`, `member_id`, `title_id`, `branch_id`, `status` = `active`, `created_at` = now, `valid_until` = now + 3 days (REQ-001, REQ-004), and a `reservation_audit` row with `action` = `created` and `actor` = member ID. Commit. A database error - roll back and stop with error 500 `INTERNAL_ERROR`.
 7. Ask the gateway to send the "reservation made" email through CON-005 (SPEC-04). A failure of this call does not cancel the reservation; it is retried as described in SPEC-04.
 
 Result: the member has an active reservation until `valid_until`, the response carries it.
 
-The whole algorithm completes within 2 seconds for 95% of requests, including step 5 (REQ-010).
+The whole algorithm completes within 2 seconds for 95% of requests, including step 3 (REQ-010).
 
 ## Response
 
@@ -121,7 +121,7 @@ When: step 1.
 
 ### 409 Limit reached
 
-When: step 3.
+When: step 4.
 
 ```json
 {
@@ -134,7 +134,7 @@ When: step 3.
 
 ### 409 Already reserved
 
-When: step 4.
+When: step 5.
 
 ```json
 {
@@ -147,7 +147,7 @@ When: step 4.
 
 ### 409 Not available
 
-When: step 5, no available copy.
+When: step 3, no available copy.
 
 ```json
 {
@@ -160,7 +160,7 @@ When: step 5, no available copy.
 
 ### 503 Catalog unavailable
 
-When: step 5, the catalog does not answer.
+When: step 3, the catalog does not answer.
 
 ```json
 {
@@ -171,11 +171,24 @@ When: step 5, the catalog does not answer.
 }
 ```
 
+### 500 Internal error
+
+When: step 6, the database fails; nothing is saved.
+
+```json
+{
+  "error": {
+    "code": "INTERNAL_ERROR",
+    "message": "Something went wrong, please try again"
+  }
+}
+```
+
 ## Non-functional requirements
 
 - Performance: 95% of requests within 2 seconds, including the catalog call (REQ-010); the catalog call timeout is set in SPEC-03.
-- Idempotency: the method is not idempotent; a repeated request after success is answered with 409 `ALREADY_RESERVED` by step 4, so a retry by the portal cannot create a second reservation of the same title.
-- Concurrency: steps 3-6 run in one transaction with a lock on the member's active reservations, so two parallel requests cannot exceed the limit of 3.
+- Idempotency: the method is not idempotent; a repeated request after success is answered with 409 `ALREADY_RESERVED` by step 5, so a retry by the portal cannot create a second reservation of the same title.
+- Concurrency: steps 4-6 run in one transaction with a lock on the member's active reservations, so two parallel requests cannot exceed the limit of 3. The catalog call (step 3) is made before the lock, so a slow catalog never holds it.
 - Audit: step 6 writes the audit record (REQ-009). Logs carry the reservation ID and member ID, no other personal data.
 
 ## Compatibility
@@ -191,6 +204,7 @@ Not applicable: new method.
 5. With 0 available copies the response is 409 `NOT_AVAILABLE`; the catalog is asked before anything is saved (REQ-011).
 6. When the catalog does not answer the response is 503 `CATALOG_UNAVAILABLE` (REQ-012).
 7. Under the expected load 95% of requests complete within 2 seconds (REQ-010).
+8. When the database fails while saving, the response is 500 `INTERNAL_ERROR` and neither a reservation nor an audit row is left (REQ-001, REQ-009).
 
 ## History
 

@@ -33,8 +33,8 @@ flowchart LR
 | service-reservations | node | Reservation service (new) | reservation rules, lifetime, audit, storage | Q-002, Q-005 |
 | ui-reservations | node | Member portal | "Reserve" button on the title page, "My reservations" page | - |
 | integration-catalog | edge | Catalog system -> Reservation service | availability of a title at a branch | Q-006 |
-| integration-portal-api | edge | Member portal -> Reservation service | create, list and cancel reservations | - |
-| integration-notifications | edge | Reservation service -> Notification gateway | reservation emails and the expiry reminder | Q-001 |
+| integration-portal-api | edge | Reservation service -> Member portal | create, list and cancel reservations | - |
+| integration-notifications | edge | Notification gateway -> Reservation service | reservation emails and the expiry reminder | Q-001 |
 
 ## Source slices
 

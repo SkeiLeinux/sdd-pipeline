@@ -46,7 +46,9 @@ Everything else - report with a hint for the main agent:
 | `placeholder`, `section`, `spec-req` | fill the template section or placeholder, or put `[?Q-NNN]`; mention every header requirement in the text and acceptance criteria |
 | `req-*`, `q-*`, `m-*` | fix the requirement table or the question / decision / intervention block |
 | `marker-closed` | the question is decided: apply the decision, remove the marker, cite `(Q-NNN)` |
-| `link-*` | create what is missing or fix the reference; `link-spec` for planned but unwritten specs is normal before the gate |
+| `link-*` | create what is missing or fix the reference; `link-spec` for planned but unwritten specs is normal before the gate; `link-file` - fix the path or remove the link |
+| `q-blocks-marker` | put the marker `[?Q-NNN]` into the Note of the blocked requirement, or remove the requirement from the question's Blocks |
+| `table-cols` | a missing or extra `\|` in the row; an escaped `\|` inside a cell does not count |
 | `domain-*` | align `analysis.md` with requirement files and slices; stale slices - subagent `sdd-source`, mode `slices` |
 | `contract-*`, `plan-*`, `spec-plan` | align the registry, cards, plan and spec headers; cover requirements |
 | `api-codes`, `api-success` | add a subsection "### <code> <message>" with condition and full body for every code the algorithm uses; state the success code in "Response" |
@@ -60,6 +62,7 @@ Everything else - report with a hint for the main agent:
 2. Mode `fix`: fix the lines of files in scope with codes from the first table.
 3. Run again. Your fix caused a new error - fix it or revert.
 4. At most 3 runs. Other modes - one run, no edits.
+5. Run by the main agent itself (no subagents in the tool) - same steps; put only the report below into the working answer, not the full script output.
 
 ## Never
 

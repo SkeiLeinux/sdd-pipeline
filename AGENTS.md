@@ -17,24 +17,24 @@ This repository turns a structured requirements document (business requirements,
 2. Read only what the step needs. The whole snapshot `source/source.md` - only for the domain map; for a domain - its slice `source/domains/<domain>.md`. Never edit the snapshot or the slices by hand.
 3. One run - one coherent portion: one domain, one registry pass, one spec unit. Update the index files you touched.
 4. Write artifact prose in `artifact_language` from `sdd.config.json`. Headings, frontmatter keys, statuses, field labels (`- Status:`), table headers and IDs stay exactly as in the templates - the checker reads them.
-5. Do not run the scripts yourself: their output is long. Checks - subagent `sdd-check`; snapshot and slices - subagent `sdd-source`. Pass parameters, get a short report, fix the meaningful remarks yourself. `python tools/check.py <feature> --next` (one line) is allowed directly.
-6. Your tool cannot call subagents - read `.agents/subagents/<name>.md` and do it yourself.
+5. Scripts run inside subagents, because their output is long: checks - subagent `sdd-check`; new feature, snapshot and slices - subagent `sdd-source`. Pass parameters, get a short report, fix the meaningful remarks yourself. `python tools/check.py <feature> --next` (one line) is allowed directly.
+6. Your tool cannot call subagents - read `.agents/subagents/<name>.md` and do its work yourself, including running its scripts; keep only its short report in your answer.
 7. Answer briefly: what was done, which files, what a person should check.
 
 ## Hard rules
 
 1. **Do not invent.** Sources are the snapshot, decisions in `decisions/decisions.md`, documentation and code the user pointed to. Unknown fact or rule - a question `Q-NNN` in `decisions/questions.md` and a marker `[?Q-NNN]` at the place. A new interface may be designed from requirements, stating that it is a design decision. Confidence is not a source.
-2. **The source is immutable.** A gap or contradiction in the input is a question, never a silent fix.
+2. **The source is immutable.** A gap or contradiction in the input is a question, never a silent fix. Never pick one side of a contradiction: put the marker on the contested value itself ("within 3 working days [?Q-025]"). `sdd-map` records contradictions under "Watch:"; `sdd-domain` turns them into questions.
 3. **Only what is in scope.** Specs are written for components with scope `in`. Requirements to systems owned by others keep scope `out` and get no specs.
 4. **One unit - one file.** One API method, one message we own, one data model per component, one integration per external system, one background job, one screen.
 5. **Algorithms are numbered steps**, not tables. Each step names where its values come from. The last line - "Result: ...".
 6. **Interface texts are verbatim** from the source.
 7. **One home per requirement** - the domain chosen by the rules in `analysis.md`. A requirement for another domain goes to "Findings for domains" or straight into that domain's file if it is already analysed.
 8. **Contracts before the plan.** After requirements: registry `contracts/README.md` and short cards CON-NNN. Full schemas are designed in specs.
-9. **Approved artifacts** (`approved`) change only on the owner's explicit request: new `version`, status back to `review`, a row in "History".
+9. **Approved artifacts** (`approved`) change only on the owner's explicit request: new `version`, status back to `review`, a row in "History". Exception - the working sections of an approved `analysis.md` that later steps maintain: the Questions column of "Domains", Read lists extended by `sdd-domain`, "Findings for domains", "Impact", "Plan coverage" of scenarios.
 10. **IDs are Latin only:** `REQ-012`, `Q-007`, `M-001`, `CON-003`, `SPEC-05`. File names - Latin, kebab-case.
 11. **Personal data** - synthetic only, in examples too.
-12. **Record human interventions.** When a person approves, edits or rejects your draft (map, registry, plan, spec) - add a block `M-NNN` to `decisions/manual.md`.
+12. **Record human interventions.** When a person approves, edits or rejects your draft (map, registry, plan, spec) - add a block `M-NNN` to `decisions/manual.md`. On approval also set the artifact's `status: approved` and add a passport history row "<artifact> approved (M-NNN)"; on edits apply them first. A conditional approval ("as a draft for planning") - keep `review`, record the condition in the M block.
 
 ## Skills
 

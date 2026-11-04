@@ -108,6 +108,23 @@ class Broken(unittest.TestCase):
         edit(self.p("specs", "SPEC-11-ui-my-reservations.md"), "## Layout", "## Layout\n\nSomething [?Q-099].")
         self.expect("link-q")
 
+    def test_broken_file_link(self):
+        edit(self.p("specs", "SPEC-11-ui-my-reservations.md"), "## Layout",
+             "## Layout\n\nSee [the mockup](images/mockup.png) and `[code](not-a-link.md)`.")
+        r = run_check(self.f)
+        hits = [x for x in r.items if x[3] == "link-file"]
+        self.assertEqual(len(hits), 1, "\n".join(map(str, r.items)))
+        self.assertIn("images/mockup.png", hits[0][4])
+
+    def test_blocked_requirement_without_marker(self):
+        edit(self.p("requirements", "integration-notifications.md"), "| when and how [?Q-001] |", "| when and how |")
+        self.expect("q-blocks-marker", "W")
+
+    def test_table_row_with_extra_cell(self):
+        edit(self.p("analysis.md"), "| availability of a title at a branch | Q-006 |",
+             "| availability of a title at a branch | | Q-006 |")
+        self.expect("table-cols", "W")
+
     def test_contract_coverage(self):
         edit(self.p("contracts", "README.md"),
              "| REQ-009 | internal audit log of the reservation service; no consumer in this feature |\n", "")
@@ -190,7 +207,7 @@ class Broken(unittest.TestCase):
         path = self.p("specs", "SPEC-06-api-create-reservation.md")
         with open(path, encoding="utf-8") as f:
             text = f.read()
-        start = text.index("When: step 5, the catalog does not answer.")
+        start = text.index("When: step 3, the catalog does not answer.")
         end = text.index("## Non-functional requirements")
         with open(path, "w", encoding="utf-8", newline="\n") as f:
             f.write(text[:start] + "When: step 5.\n\n" + text[end:])

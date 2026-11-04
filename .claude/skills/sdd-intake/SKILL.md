@@ -5,7 +5,7 @@ description: "Accept a new requirements document into the pipeline: immutable nu
 
 # sdd-intake: accept the input
 
-Parameters: feature ID (matches `feature_id_pattern` in `sdd.config.json`), short title, path to the input. Missing - ask and stop.
+Parameters: feature ID (matches `feature_id_pattern` in `sdd.config.json`), short title, path to the input (any Markdown file; the script copies it into `source/import/`), owner, origin (name, version, link if there is one). Missing ID, title, input or owner - ask and stop. No link - write the origin without it.
 
 ## Before you start
 
@@ -17,7 +17,7 @@ The input must be Markdown. Anything else (Word, wiki page, PDF, Google Doc) - a
 
 1. Call subagent `sdd-source`: mode `new` with the ID, slug (Latin kebab-case from the title), title, owner (ask if unknown), origin as the user described it (name, link, version) and the input path. It creates `features/<ID>-<slug>/` with the passport, empty `decisions/` and the input in `source/import/`.
 2. Call subagent `sdd-source`: feature folder, mode `snapshot`, the input path in `source/import/`, the same origin.
-3. Fill the passport `README.md`: Summary from the input's goals and scope sections with section numbers, constraints from the input. Leave "Spec plan" as it is.
+3. Fill the passport `README.md`: Summary from the input's goals and scope sections with section numbers; Components - only what the input names, new or existing as the input says (not said - write "new or existing - not stated" and register a question in `decisions/questions.md`); constraints from the input with section numbers; Assumptions - "None yet.". Keep the template's HTML comments, `status: intake` and "Spec plan" as they are.
 4. History row: "Input accepted, version <N>; snapshot made".
 
 ## Never
@@ -31,4 +31,4 @@ Edit `source/source.md`, retell the input, invent the owner or version.
 
 ## Answer
 
-Feature folder, number of sections, whether headings were numbered by the script, and the human check: section numbers match the original, tables and images survived conversion. Next step - `sdd-map`.
+Feature folder, number of sections, whether headings were numbered by the script, and the human check: section numbers match the original (the snapshot writes `1. Goals` as `1 Goals`; text before the first heading becomes section 0 Preamble), tables and images survived conversion. The original input file outside the feature may be deleted by the user. Next step - `sdd-map`.
