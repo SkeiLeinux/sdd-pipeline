@@ -15,11 +15,13 @@
 
   "ui_domain_prefix": "ui-",
 
-  "unit_types": ["component", "data-model", "integration", "job", "api-method", "scenario", "ui", "config"],
+  "unit_types": ["component", "data-model", "integration", "job", "message", "api-method", "scenario", "ui", "config"],
   "_unit_types": "Spec unit types in numbering order. Each type needs templates/spec/<type>.md; its '## ' headings are the required sections.",
 
   "api_unit_type": "api-method",
   "data_model_unit_type": "data-model",
+  "contract_unit_types": {"api-method": "api", "message": "message"},
+  "_contract_unit_types": "Unit types that describe exactly one in-scope contract of the given kind (one method - one spec, one message - one spec).",
 
   "contract_kinds": ["api", "message", "file", "other"],
   "contract_modes": ["new", "change", "reuse", "external"],

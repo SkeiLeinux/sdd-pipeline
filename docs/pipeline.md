@@ -19,7 +19,17 @@ A **feature** is all the work on one input document, in the folder `features/<ID
 
 ### 0. Intake
 
-Convert the document to Markdown with any tool, put it into `source/import/`, run `sdd-intake`. The script keeps the text and normalizes headings to numbered sections (`--number` numbers them if the document has no numbering). A person checks that the numbering matches the original and that tables and images survived the conversion.
+Convert the document to Markdown with any tool (for Word: `pandoc input.docx -t gfm --extract-media=. -o input.md`), then run `sdd-intake`. It creates the feature folder with `tools/new_feature.py` and makes the snapshot; without an agent:
+
+```bash
+python tools/new_feature.py PAY-42 refunds --title "Refunds" --owner "Analyst" --source "BRD v3" --input brd.md
+```
+
+```bash
+python tools/snapshot.py features/PAY-42-refunds/source/import/brd.md features/PAY-42-refunds/source
+```
+
+Several documents for one feature (requirements plus an addendum) - join them into one Markdown file, each under its own top-level heading: one feature - one numbered source. Images and relative links keep working: the snapshot and the slices rewrite their paths. The script keeps the text and normalizes headings to numbered sections (`--number` numbers them if the document has no numbering). A person checks that the numbering matches the original and that tables and images survived the conversion.
 
 ### 1. Domain map
 
@@ -66,6 +76,16 @@ Put it into `source/import/` and run `sdd-update`. The snapshot is replaced, `so
 ### Someone finds a problem in a spec
 
 Stop the affected work - never "just do it right". Register a question, fix the contract first if the interface changes, then the spec: `version + 1`, status `review`, a row in "History", approval again.
+
+## Publishing specs for readers outside git
+
+Approval often happens where the business reads documents. Specs are plain Markdown, so any converter works, for example:
+
+```bash
+pandoc features/PAY-42-refunds/specs/SPEC-06-api-create-refund.md -o SPEC-06.docx
+```
+
+The Markdown in git stays the source of truth: comments from a wiki or a Word file are brought back as changes to the spec, never the other way round.
 
 ## After the specs
 

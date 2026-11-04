@@ -75,6 +75,15 @@ Watch: <contradictions, different names for one thing, text only on images>.
 
 - <rule> (source N) - applies to <domains>.
 
+## Glossary
+
+<!-- Terms of the feature: one name per thing, the synonyms the source uses for it, and the name used in specs
+     (entity, field, label). Two names for one thing in the source - a question. -->
+
+| Term | Meaning | Synonyms in the source | In specs |
+|---|---|---|---|
+| <term> | <meaning> | <other names or -> | <Entity, `field`> |
+
 ## Findings for domains
 
 <!-- Requirements and questions found while working on one domain whose home is another, not yet analysed domain.

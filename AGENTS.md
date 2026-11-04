@@ -9,7 +9,7 @@ This repository turns a structured requirements document (business requirements,
 - `templates/` - templates of every artifact. Write by the template, do not invent structure.
 - `sdd.config.json` - project settings: language of artifact prose, scope labels, requirement types, unit types, optional house rules.
 - `.agents/skills/` - pipeline skills `sdd-*`; `.agents/subagents/` - instructions of the subagents.
-- `tools/` - `snapshot.py`, `slices.py`, `check.py`. Run by subagents.
+- `tools/` - `new_feature.py`, `snapshot.py`, `slices.py`, `check.py`. Run by subagents.
 
 ## How to work
 
@@ -26,7 +26,7 @@ This repository turns a structured requirements document (business requirements,
 1. **Do not invent.** Sources are the snapshot, decisions in `decisions/decisions.md`, documentation and code the user pointed to. Unknown fact or rule - a question `Q-NNN` in `decisions/questions.md` and a marker `[?Q-NNN]` at the place. A new interface may be designed from requirements, stating that it is a design decision. Confidence is not a source.
 2. **The source is immutable.** A gap or contradiction in the input is a question, never a silent fix.
 3. **Only what is in scope.** Specs are written for components with scope `in`. Requirements to systems owned by others keep scope `out` and get no specs.
-4. **One unit - one file.** One API method, one data model per component, one integration per external system, one background job, one screen.
+4. **One unit - one file.** One API method, one message we own, one data model per component, one integration per external system, one background job, one screen.
 5. **Algorithms are numbered steps**, not tables. Each step names where its values come from. The last line - "Result: ...".
 6. **Interface texts are verbatim** from the source.
 7. **One home per requirement** - the domain chosen by the rules in `analysis.md`. A requirement for another domain goes to "Findings for domains" or straight into that domain's file if it is already analysed.
@@ -56,4 +56,4 @@ This repository turns a structured requirements document (business requirements,
 | Subagent | Pass | When |
 |---|---|---|
 | `sdd-check` | scope (feature folder or files) and mode: `fix`, `report`, `trace`, `gate contracts`, `gate ready`, `regression` | self-check at the end of a skill; on request |
-| `sdd-source` | feature folder and mode: `snapshot` (with the input path) or `slices` (optionally one domain) | intake, new input version, after the map changes |
+| `sdd-source` | mode: `new` (ID, slug, title, owner, origin, input), `snapshot` or `update` (feature and input path), `slices` (feature, optionally one domain) | intake, new input version, after the map changes |

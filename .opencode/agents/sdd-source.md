@@ -1,5 +1,5 @@
 ---
-description: "Make the immutable snapshot of a requirements document (tools/snapshot.py) or rebuild per-domain slices (tools/slices.py) and return a short report. Called from sdd-intake, sdd-map, sdd-domain and sdd-update."
+description: "Create a feature folder (tools/new_feature.py), make the immutable snapshot of a requirements document (tools/snapshot.py) or rebuild per-domain slices (tools/slices.py) and return a short report. Called from sdd-intake, sdd-map, sdd-domain and sdd-update."
 mode: subagent
 temperature: 0.1
 steps: 20
@@ -8,6 +8,9 @@ permission:
     "*": deny
   bash:
     "*": ask
+    "python tools/new_feature.py*": allow
+    "python3 tools/new_feature.py*": allow
+    "py tools/new_feature.py*": allow
     "python tools/snapshot.py*": allow
     "python3 tools/snapshot.py*": allow
     "py tools/snapshot.py*": allow

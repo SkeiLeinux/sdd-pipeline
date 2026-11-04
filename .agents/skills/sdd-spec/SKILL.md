@@ -23,16 +23,19 @@ Parameters: feature folder and `SPEC-NN`. Not in the plan - stop and suggest `sd
 1. Create `specs/SPEC-NN-<slug>.md` exactly as named in the plan. Frontmatter: values from the plan row, `mode`, `status: draft`, `version: 1`, `depends`, `updated` - today.
 2. Fill every section of the template. Not applicable - "Not applicable: <why>".
 3. Design the full contract here: method and path, parameters, schemas, errors, access, with sources; respect the purpose and data of the card and give its version. A new interface - explicit design decisions from requirements; an existing one - only from its documentation or code.
-4. `api-method`: complete working examples - path with sample values, full request body for methods with a body, full response, the full body of every error code. No "..." except for long values. `api_response_required_keys` in `sdd.config.json` - every response example contains them.
-5. `data-model`: columns and logical types from `sdd.config.json`; constraints in the Constraint column; indexes - separate table.
-6. Algorithms - numbered steps; every value with its source (table and column, contract, configuration key); error branches inside steps; last line "Result: ...".
-7. Acceptance criteria - at least one testable statement per header requirement, ending with `(REQ-NNN)`.
-8. Unknowns - `[?Q-NNN]` and a question block; never an invented value. Add a link to this spec in the card's "Detailed spec".
-9. Status of the plan row, if it changed.
+4. `api-method`: authentication and authorization (including which objects the caller may touch); every request parameter with type, required and constraints; validation as the first steps of the algorithm; the success status code; complete working examples - path with sample values, full request body for methods with a body, full response; a subsection in "Response codes" for every code the algorithm can stop with and for the shared codes that can happen, each with its condition and full body. No "..." except for long values. `api_response_required_keys` in `sdd.config.json` - every response example contains them. Non-functional needs (performance, idempotency, pagination, limits, audit) and compatibility for `mode: change`.
+5. `data-model`: columns and logical types from `sdd.config.json`; a primary key per table; constraints in the Constraint column; every enum value with its meaning and label; indexes - separate table; retention, personal data and volume in "Data lifecycle".
+6. `message`: channel, producer and consumers, full payload with example, when it is sent (inside or after which transaction), delivery guarantee, ordering, duplicates, dead letters, versioning.
+7. `ui`: every field and action of the domain's "Screen fields" table; validation messages, confirmations and where actions lead; what the user sees for each error code of the operations.
+8. `job` and `integration`: concurrency and restart, retries, volumes, monitoring.
+9. Algorithms - numbered steps; every value with its source (table and column, contract, configuration key); error branches inside steps; last line "Result: ...".
+10. Acceptance criteria - at least one testable statement per header requirement, ending with `(REQ-NNN)`.
+11. Unknowns - `[?Q-NNN]` and a question block; never an invented value. Add a link to this spec in the card's "Detailed spec".
+12. Status of the plan row, if it changed.
 
 ## Self-check
 
-- [ ] Every header requirement is in the text and in acceptance criteria.
+- [ ] Every header requirement is in the text and in acceptance criteria; acceptance criteria cover the success path and every error.
 - [ ] No field, code, status or path without a source or an explicit design decision.
 - [ ] Names and types agree with the data model and related specs; interface texts match the source character for character.
 - [ ] No template placeholders left except under `[?Q-NNN]`.

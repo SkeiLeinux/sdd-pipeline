@@ -20,6 +20,7 @@ TOOLS = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, TOOLS)
 
 import check  # noqa: E402
+import new_feature  # noqa: E402
 import sddlib  # noqa: E402
 import slices  # noqa: E402
 import snapshot  # noqa: E402
@@ -175,6 +176,44 @@ class Broken(unittest.TestCase):
         edit(self.p("contracts", "README.md"), "status: review", "status: draft")
         self.expect("gate", gate="contracts")
 
+    def test_error_code_without_subsection(self):
+        path = self.p("specs", "SPEC-06-api-create-reservation.md")
+        with open(path, encoding="utf-8") as f:
+            text = f.read()
+        start = text.index("### 503 Catalog unavailable")
+        end = text.index("## Non-functional requirements")
+        with open(path, "w", encoding="utf-8", newline="\n") as f:
+            f.write(text[:start] + text[end:])
+        self.expect("api-codes")
+
+    def test_error_code_without_body(self):
+        path = self.p("specs", "SPEC-06-api-create-reservation.md")
+        with open(path, encoding="utf-8") as f:
+            text = f.read()
+        start = text.index("When: step 5, the catalog does not answer.")
+        end = text.index("## Non-functional requirements")
+        with open(path, "w", encoding="utf-8", newline="\n") as f:
+            f.write(text[:start] + "When: step 5.\n\n" + text[end:])
+        self.expect("api-codes")
+
+    def test_success_code_missing(self):
+        edit(self.p("specs", "SPEC-06-api-create-reservation.md"), "Status: 201.", "Success.")
+        self.expect("api-success")
+
+    def test_table_without_primary_key(self):
+        edit(self.p("specs", "SPEC-02-reservation-data-model.md"), "| `id` | uuid | Reservation ID | PK |",
+             "| `id` | uuid | Reservation ID | NOT NULL |")
+        self.expect("dm-pk", "W")
+
+    def test_scenario_coverage(self):
+        edit(self.p("analysis.md"), "| SPEC-09 |", "| - |")
+        self.expect("scenario-coverage")
+
+    def test_message_unit_needs_message_contract(self):
+        edit(self.p("README.md"), "| [SPEC-05](specs/SPEC-05-expire-reservations-job.md) | job |",
+             "| [SPEC-05](specs/SPEC-05-expire-reservations-job.md) | message |")
+        self.expect("plan-contracts")
+
     def test_trace_written(self):
         with redirect_stdout(io.StringIO()):
             check.main([self.f, "--trace"])
@@ -234,6 +273,19 @@ class Snapshot(unittest.TestCase):
         code, _ = self.run_snap("--number")
         self.assertEqual(code, 0)
 
+    def test_relative_links_follow_the_snapshot(self):
+        self.write("# Doc\n\n## 1 Screens\n\n![mock](img/screen.png) and [site](https://example.org) and "
+                   "[part](#top).\n\n```\n![in code](img/x.png)\n```\n")
+        self.assertEqual(self.run_snap()[0], 0)
+        text = "\n".join(sddlib.read_lines(os.path.join(self.out, "source.md")))
+        self.assertIn("![mock](../../img/screen.png)", text)
+        self.assertIn("(https://example.org)", text)
+        self.assertIn("(#top)", text)
+        self.assertIn("![in code](img/x.png)", text)
+        lines, secs = sddlib.parse_source(os.path.join(self.out, "source.md"))
+        sl, _ = sddlib.build_slice("X-1", "d", [(0, "1", "")], lines, secs)
+        self.assertIn("![mock](../../../img/screen.png)", sl)
+
     def test_immutable_and_changes(self):
         self.write("# Doc\n\n## Intro\n\nText.\n\n## Rules\n\nRule A.\n")
         self.assertEqual(self.run_snap("--number")[0], 0)
@@ -243,6 +295,32 @@ class Snapshot(unittest.TestCase):
         changes = "\n".join(sddlib.read_lines(os.path.join(self.out, "changes.md")))
         self.assertTrue(re.search(r"\| changed \| 2 \| Rules \|", changes))
         self.assertTrue(re.search(r"\| added \| 3 \| New part \|", changes))
+
+
+class NewFeature(unittest.TestCase):
+    def test_scaffold_is_clean(self):
+        tmp = tempfile.mkdtemp()
+        try:
+            shutil.copytree(os.path.join(ROOT, "templates"), os.path.join(tmp, "templates"))
+            shutil.copyfile(os.path.join(ROOT, "sdd.config.json"), os.path.join(tmp, "sdd.config.json"))
+            inp = os.path.join(tmp, "brd.md")
+            with open(inp, "w", encoding="utf-8") as f:
+                f.write("# Refunds\n\n## Goals\n\nRefund a payment.\n")
+            with redirect_stdout(io.StringIO()):
+                self.assertEqual(new_feature.main(["PAY-42", "refunds", "--title", "Refunds", "--owner", "Analyst",
+                                                   "--source", "brd.md v1", "--input", inp, "--root", tmp]), 0)
+                self.assertEqual(new_feature.main(["PAY-42", "refunds", "--title", "x", "--root", tmp]), 1)
+                self.assertEqual(new_feature.main(["pay42", "refunds", "--title", "x", "--root", tmp]), 1)
+            fdir = os.path.join(tmp, "features", "PAY-42-refunds")
+            self.assertTrue(os.path.isfile(os.path.join(fdir, "source", "import", "brd.md")))
+            report = check.Report(tmp)
+            check.check_feature(fdir, tmp, sddlib.load_config(tmp), report)
+            self.assertEqual(report.errors, 0, "\n".join(map(str, report.items)))
+            meta, _ = sddlib.parse_frontmatter(sddlib.read_lines(os.path.join(fdir, "README.md")))
+            self.assertEqual((meta["id"], meta["status"], meta["owner"]), ("PAY-42", "intake", "Analyst"))
+            self.assertIn("| Feature created |", "\n".join(sddlib.read_lines(os.path.join(fdir, "README.md"))))
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
 
 
 if __name__ == "__main__":

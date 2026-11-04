@@ -13,7 +13,7 @@ Call subagent `sdd-source`: mode `slices`, the domain. An error - stop and show 
 
 ## Read
 
-1. `analysis.md`: "How to read the map", the domain's row in "Domains", its subsection in "Source slices", "Cross-cutting rules", its subsection in "Findings for domains".
+1. `analysis.md`: "How to read the map", the domain's row in "Domains", its subsection in "Source slices", "Cross-cutting rules", "Glossary", its subsection in "Findings for domains".
 2. The slice `source/domains/<domain>.md` - whole. Do not read the snapshot section by section.
 3. `requirements/README.md` and files of neighbouring domains - only to avoid duplicates. `requirements/dispositions.md`, if present.
 4. `decisions/questions.md` and `decisions/decisions.md` - questions and decisions about this domain.
@@ -23,7 +23,7 @@ Call subagent `sdd-source`: mode `slices`, the domain. An error - stop and show 
 ## Do
 
 1. Every testable statement of the slice whose home is this domain (rules of one home in `analysis.md`) - a requirement. Every row of a logic table in the source - a separate requirement; compare the counts.
-2. `requirements/<domain>.md` by the template: "Boundary", subsections by topic, the seven columns. Source - section numbers as in the snapshot, always. Scope - `in` for components we spec, `out` for what other systems must do. Type - from `requirement_types`. Wording close to the source; interface texts verbatim, in quotes.
+2. `requirements/<domain>.md` by the template: "Boundary", subsections by topic, the seven columns. Source - section numbers as in the snapshot, always. Scope - `in` for components we spec, `out` for what other systems must do. Type - from `requirement_types`. Wording close to the source, entity names from the Glossary; interface texts verbatim, in quotes.
 3. A requirement whose home is another domain: that domain not analysed yet - a bullet under its name in "Findings for domains"; already analysed - a row in its file. Never the same requirement in two files.
 4. UI domain: section "Screen fields" - every field and action of the screens in the slice, the rule behind it (node REQ) and the operation that feeds it (edge REQ or CON). The screen is not a source of data.
 5. Gaps, contradictions, vague words ("if needed", "several times"), two names for one thing - a block in `decisions/questions.md` and a marker `[?Q-NNN]` in the Note column. A decision already exists - apply it and cite `(Q-NNN)`. Check the domain as a whole: who acts, what triggers it, the result, edge cases and errors, access rights, audit.

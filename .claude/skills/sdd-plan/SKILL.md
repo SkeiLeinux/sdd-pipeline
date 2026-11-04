@@ -20,7 +20,8 @@ First call subagent `sdd-check`: mode `gate contracts`. Not passed - list what i
 ## Slicing rules
 
 - Only active in-scope requirements; out-of-scope, excluded and superseded ones are not planned.
-- New component - one `component` unit. Data model - one `data-model` per component. External system - one `integration` per system. Background job - one `job` per job. API method - one `api-method` per method, describing exactly one in-scope api contract. Screen, tab, drawer or dialog - one `ui`. Configuration - one `config` per component.
+- New component - one `component` unit. Data model - one `data-model` per component. External system - one `integration` per system. Background job - one `job` per job. API method - one `api-method` per method, describing exactly one in-scope `api` contract. Message, event or queue we own - one `message` per message, describing exactly one in-scope `message` contract (mapping in `contract_unit_types`). Screen, tab, drawer or dialog - one `ui`. Configuration - one `config` per component.
+- In-scope contracts of kind `file` or `other` (exports, reports, file exchanges) - described by the `integration` or `job` unit that produces or reads them.
 - Every new or changed in-scope contract is described by a unit; external and reuse contracts are covered by the units of their consumers, never by a spec for the other team.
 - A scenario of the map where a user action crosses several components and no unit shows the chain - a `scenario` unit; a scenario without a user is covered by a `job`. Fill "Plan coverage" in `analysis.md`.
 - Tables by domains of the map: `### <domain> - <summary>`; a unit lives in the domain whose requirements it covers; data model and configuration - with their component's node. Scenario units - group `### Scenarios`.
@@ -44,4 +45,4 @@ Create spec files, put two methods in one unit, design endpoints here.
 
 ## Answer
 
-Units per type, requirements covered by several units, units blocked by questions, the order to write them: component and data model -> integrations and jobs -> API methods -> scenarios and screens -> configuration.
+Units per type, requirements covered by several units, units blocked by questions, the order to write them: component and data model -> integrations, jobs and messages -> API methods -> scenarios and screens -> configuration.

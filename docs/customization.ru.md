@@ -13,8 +13,9 @@
 | `scope` | `{"in": "in", "out": "out"}` | метки колонки Scope, например `{"in": "ours", "out": "external"}` |
 | `requirement_types` | `FR`, `NFR`, `BR`, `IR` | допустимые типы требований |
 | `ui_domain_prefix` | `ui-` | домены с этим префиксом обязаны иметь таблицу "Screen fields" |
-| `unit_types` | восемь типов | типы единиц спецификаций в порядке нумерации; каждому нужен шаблон |
-| `api_unit_type`, `data_model_unit_type` | `api-method`, `data-model` | к каким типам применяются правила API и модели данных |
+| `unit_types` | девять типов | типы единиц спецификаций в порядке нумерации; каждому нужен шаблон |
+| `api_unit_type`, `data_model_unit_type` | `api-method`, `data-model` | к каким типам применяются проверки API (коды ответов, обертка) и модели данных |
+| `contract_unit_types` | `{"api-method": "api", "message": "message"}` | типы единиц, которые описывают ровно один контракт зоны `in` указанного вида |
 | `contract_kinds`, `contract_modes` | `api, message, file, other`; `new, change, reuse, external` | допустимые значения в контрактах |
 | `api_response_required_keys` | `[]` | ключи, которые обязан содержать каждый пример ответа API, - ваша обертка ответа, например `["data", "error"]` |
 | `data_model` | `Name, Type, Comment, Constraint`, логические типы | колонки и типы таблиц модели данных |
@@ -37,8 +38,9 @@
 
 1. Добавьте тип в `unit_types` (позиция задает порядок нумерации).
 2. Создайте `templates/spec/<тип>.md`. Его заголовки `## ` станут обязательными разделами каждой единицы этого типа.
-3. Добавьте правило нарезки в `.agents/skills/sdd-plan/SKILL.md` и, если у типа есть особые правила, в `sdd-spec` и `sdd-review`.
-4. Запустите `python tools/sync_agents.py`.
+3. Если одна единица типа описывает ровно один контракт (как `api-method`), добавьте его в `contract_unit_types`.
+4. Добавьте правило нарезки в `.agents/skills/sdd-plan/SKILL.md` и, если у типа есть особые правила, в `sdd-spec` и `sdd-review`.
+5. Запустите `python tools/sync_agents.py`.
 
 ## Правила команды для API и данных
 

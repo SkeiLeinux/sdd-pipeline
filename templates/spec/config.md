@@ -23,13 +23,20 @@ updated: YYYY-MM-DD
 
 ## Parameters
 
-| Key | Type | Default | Description | Source |
-|---|---|---|---|---|
-| `<key>` | <type> | <value> | <...> | REQ-NNN |
+| Key | Type | Default | Allowed values | Description | Source |
+|---|---|---|---|---|---|
+| `<key>` | <type> | <value> | <range or list> | <...> | REQ-NNN |
 
 ## Environments
 
-<Values that differ per environment, secrets and who provides them.>
+<Values that differ per environment, secrets and who provides them, where they are stored.>
+
+## Validation and reload
+
+<!-- What happens with an invalid or missing value (fail at start, fall back to default), whether a change needs a
+     restart or is picked up at runtime. -->
+
+<...>
 
 ## Acceptance criteria
 

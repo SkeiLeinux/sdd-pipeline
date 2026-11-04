@@ -49,3 +49,14 @@ updated: 2026-11-03
 - Question: Which catalog operation returns the number of available copies of a title per branch, with what identifiers and format? Does it also return the title name and author, which the "My reservations" table needs?
 - Proposal: -
 - Answer: -
+
+### Q-007 Is cancelling confirmed by the member
+
+- To: business analyst
+- Where: source 6.2; REQ-025, SPEC-11
+- Blocks: SPEC-11
+- Status: open
+- Sent: 2026-11-04
+- Question: The source does not say whether "Cancel" asks for confirmation. Cancelling cannot be undone - the copy may go to another member. Is a confirmation dialog needed, and with which text?
+- Proposal: a dialog "Cancel this reservation?" with "Cancel reservation" and "Keep".
+- Answer: -

@@ -49,6 +49,17 @@ One row - one change of a reservation (REQ-009).
 | `occurred_at` | date-time | When the change happened | NOT NULL |
 | `details` | json | Previous and new status | |
 
+## Enumerations
+
+| Column | Value | Meaning | Label |
+|---|---|---|---|
+| `reservation.status` | `active` | the copy is held for the member until `valid_until` | "Active" |
+| `reservation.status` | `expired` | `valid_until` passed (SPEC-05) | "Expired" |
+| `reservation.status` | `cancelled` | the member cancelled it (SPEC-08) | "Cancelled" |
+| `reservation_audit.action` | `created` | reservation made | - |
+| `reservation_audit.action` | `cancelled` | cancelled by the member | - |
+| `reservation_audit.action` | `expired` | expired by the job | - |
+
 ## Indexes
 
 | Table | Index | Columns | Unique | Why |
@@ -56,6 +67,13 @@ One row - one change of a reservation (REQ-009).
 | `reservation` | `reservation_member_status_idx` | `member_id`, `status` | no | limit of 3 active and the duplicate check (SPEC-06), the member's list (SPEC-07) |
 | `reservation` | `reservation_status_valid_until_idx` | `status`, `valid_until` | no | the expiry job (SPEC-05) |
 | `reservation_audit` | `reservation_audit_reservation_idx` | `reservation_id` | no | audit trail of one reservation |
+
+## Data lifecycle
+
+- Closed reservations stay visible to the member for 30 days after `closed_at` (REQ-006) [?Q-002]; after that they are no longer returned by SPEC-07. Whether rows are then deleted or kept for audit is not defined by the source [?Q-002].
+- `reservation_audit` rows are kept as long as their reservation.
+- Personal data: only `member_id`, an opaque ID from the portal; no names or emails are stored.
+- Volume: at most 3 active reservations per member; growth is driven by closed reservations within the retention period.
 
 ## Migration
 

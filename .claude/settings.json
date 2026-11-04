@@ -2,6 +2,7 @@
   "permissions": {
     "allow": [
       "Bash(python tools/check.py:*)",
+      "Bash(python tools/new_feature.py:*)",
       "Bash(python tools/snapshot.py:*)",
       "Bash(python tools/slices.py:*)",
       "Bash(python tools/sync_agents.py:*)",

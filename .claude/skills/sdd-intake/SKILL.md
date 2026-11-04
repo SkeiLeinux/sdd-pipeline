@@ -9,15 +9,16 @@ Parameters: feature ID (matches `feature_id_pattern` in `sdd.config.json`), shor
 
 ## Before you start
 
+Several documents for one feature (requirements plus an addendum, a separate document of screens) - ask the user to join them into one Markdown file, each document under its own top-level heading, and make one snapshot: one feature - one numbered source.
+
 The input must be Markdown. Anything else (Word, wiki page, PDF, Google Doc) - ask the user to convert it with a tool of their choice (pandoc, the wiki's export, copy-paste) and put the `.md` into `features/<ID>-<slug>/source/import/`. Do not convert or retell it yourself: the snapshot must be the document, not your reading of it.
 
 ## Do
 
-1. Create the folder `features/<ID>-<slug>/` (slug - Latin kebab-case from the title) and put the input into `source/import/` if it is not there.
-2. Call subagent `sdd-source`: feature folder, mode `snapshot`, the input path, origin as the user described it (name, link, version).
-3. Create `README.md` from `templates/feature/passport.md`: frontmatter (`status: intake`, `source`, `owner` - ask if unknown, `updated` - today), Summary from the input's goals and scope sections with section numbers, constraints from the input. Leave "Spec plan" as in the template.
-4. Create `decisions/questions.md`, `decisions/decisions.md`, `decisions/manual.md` from the templates, without blocks: questions.md - only frontmatter and title; decisions.md - the same; manual.md - with "No interventions yet."
-5. History row: "Input accepted, version <N>; snapshot made".
+1. Call subagent `sdd-source`: mode `new` with the ID, slug (Latin kebab-case from the title), title, owner (ask if unknown), origin as the user described it (name, link, version) and the input path. It creates `features/<ID>-<slug>/` with the passport, empty `decisions/` and the input in `source/import/`.
+2. Call subagent `sdd-source`: feature folder, mode `snapshot`, the input path in `source/import/`, the same origin.
+3. Fill the passport `README.md`: Summary from the input's goals and scope sections with section numbers, constraints from the input. Leave "Spec plan" as it is.
+4. History row: "Input accepted, version <N>; snapshot made".
 
 ## Never
 

@@ -23,10 +23,11 @@ Why: input documents describe processes, screens and rules mixed together, while
 4. **Sections by domain.** Every section of `source/index.md`: its domains, "all" for overview or constraints sections, or "-" with the reason (history, glossary, motivation).
 5. **Scenarios.** Chains of user or system actions through several domains, with source sections and the path.
 6. **Cross-cutting rules** (access, limits of the feature) with the domains they apply to.
-7. Questions that decide domain boundaries (who owns the data, which component does it, name of a new component) - blocks in `decisions/questions.md`, markers in the domains table. Next free ID: `python tools/check.py <feature> --next`.
-8. Call subagent `sdd-source`: mode `slices`. Errors in Read lists - fix the lists and rebuild.
-9. "Next steps": the order to analyse domains - back-end nodes and edges first, UI domains last.
-10. Passport: `status: analysis`, history row "Domain map drafted".
+7. **Glossary.** Every entity and term of the feature with one name to use in specs, and the synonyms the source uses. Two names for one thing, or one name for two things - a question.
+8. Questions that decide domain boundaries (who owns the data, which component does it, name of a new component) - blocks in `decisions/questions.md`, markers in the domains table. Next free ID: `python tools/check.py <feature> --next`.
+9. Call subagent `sdd-source`: mode `slices`. Errors in Read lists - fix the lists and rebuild.
+10. "Next steps": the order to analyse domains - back-end nodes and edges first, UI domains last.
+11. Passport: `status: analysis`, history row "Domain map drafted".
 
 ## Never
 

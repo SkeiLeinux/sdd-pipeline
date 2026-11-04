@@ -730,13 +730,14 @@ def check_plan(F):
                 for cid in row["cons"]:
                     if cid not in F.cards:
                         F.add("E", path, "link-con", "%s: %s has no card" % (sid, cid), ln)
-                if cells[1] == F.cfg["api_unit_type"]:
+                kind = (F.cfg.get("contract_unit_types") or {}).get(cells[1])
+                if kind:
                     good = len(row["cons"]) == 1 and row["cons"][0] in F.cards and \
-                        F.cards[row["cons"][0]]["meta"].get("kind") == "api" and \
+                        F.cards[row["cons"][0]]["meta"].get("kind") == kind and \
                         F.cards[row["cons"][0]]["meta"].get("scope") == F.scope_in
                     if not good:
-                        F.add("E", path, "plan-contracts", "%s: an %s unit describes exactly one in-scope api contract"
-                              % (sid, cells[1]), ln)
+                        F.add("E", path, "plan-contracts", "%s: a %s unit describes exactly one in-scope %s contract"
+                              % (sid, cells[1], kind), ln)
                 if cells[6] not in SPEC_STATUSES:
                     F.add("E", path, "plan-status", "%s: status '%s' - allowed: %s" % (sid, cells[6],
                                                                                       ", ".join(SPEC_STATUSES)), ln)
@@ -759,6 +760,18 @@ def check_plan(F):
         if m.get("scope") == F.scope_in and m.get("mode") in ("new", "change") and cid not in planned_cons:
             F.add(sev, path, "plan-contracts", "%s (new or changed, in scope) is not described by any planned spec"
                   % cid)
+    if F.analysis:
+        for ln, cells in F.analysis["scenarios"]:
+            if len(cells) < 4 or not cells[0] or cells[0].lower() == "scenario":
+                continue
+            ids = sddlib.ids_in(cells[3], "SPEC")
+            if not ids:
+                F.add(sev, F.analysis["path"], "scenario-coverage", "scenario '%s': 'Plan coverage' names no SPEC-NN"
+                      % cells[0], ln)
+            for sid in ids:
+                if sid not in F.plan:
+                    F.add("E", F.analysis["path"], "scenario-coverage", "scenario '%s': %s is not in the spec plan"
+                          % (cells[0], sid), ln)
 
 
 # ====================================================================== checks: specs
@@ -838,8 +851,10 @@ def check_specs(F):
                       % rid)
         if tp == F.cfg["data_model_unit_type"]:
             _check_data_model(F, path, lines)
-        if tp == F.cfg["api_unit_type"] and F.cfg.get("api_response_required_keys"):
-            _check_envelope(F, path, lines)
+        if tp == F.cfg["api_unit_type"]:
+            _check_api_codes(F, path, lines)
+            if F.cfg.get("api_response_required_keys"):
+                _check_envelope(F, path, lines)
     for sid, row in F.plan.items():
         if sid not in F.specs:
             F.add(F.sev("ready"), F.p("README.md"), "link-spec", "%s is planned but %s is not written yet"
@@ -859,6 +874,8 @@ def _check_data_model(F, path, lines):
             F.add("E", path, "dm-cols", "data model columns: %s (optional '%s' for mode: change)"
                   % (" | ".join(cols), chg), t["line"])
             continue
+        if len(cols) >= 4 and not any(len(c) > 3 and re.search(r"\bPK\b", c[3]) for _, c in t["rows"]):
+            F.add("W", path, "dm-pk", "table has no primary key (PK in the Constraint column)", t["line"])
         for ln, cells in t["rows"]:
             if len(cells) < 2:
                 continue
@@ -867,6 +884,38 @@ def _check_data_model(F, path, lines):
             if not base or base.group(0) not in types:
                 F.add("E", path, "dm-type", "type '%s' - use a logical type: %s" % (cells[1], ", ".join(sorted(types))),
                       ln)
+
+
+def _check_api_codes(F, path, lines):
+    """Success code stated; every code the algorithm stops with is described, error bodies given."""
+    cm = sddlib.code_mask(lines)
+    resp = sddlib.section(lines, "Response", 2, cm)
+    if resp:
+        text = "\n".join(lines[i] for i in range(*resp) if not cm[i])
+        if not re.search(r"\b[23]\d\d\b", text):
+            F.add("E", path, "api-success", "section 'Response' does not state the success status code "
+                  "(\"Status: 200\", 201, 204 ...)", resp[0] - 1)
+    used = {}
+    alg = sddlib.section(lines, "Algorithm", 2, cm)
+    if alg:
+        for i in range(*alg):
+            if not cm[i]:
+                for m in re.finditer(r"\b(?:error|code|status)\s+([1-5]\d\d)\b", lines[i], re.I):
+                    used.setdefault(m.group(1), i)
+    described = set()
+    rng = sddlib.section(lines, "Response codes", 2, cm)
+    if rng:
+        for ln, title, b, e in sddlib.subsections(lines, rng[0], rng[1], 3, cm):
+            m = re.match(r"^([1-5]\d\d)\b", title)
+            if not m:
+                continue
+            described.add(m.group(1))
+            if int(m.group(1)) >= 300 and not any(cm[i] for i in range(b, e)):
+                F.add("E", path, "api-codes", "response code %s has no example body" % m.group(1), ln)
+    for code, ln in sorted(used.items()):
+        if int(code) >= 300 and code not in described:
+            F.add("E", path, "api-codes", "code %s is used in the algorithm but has no subsection '### %s <message>' "
+                  "in 'Response codes'" % (code, code), ln)
 
 
 def _check_envelope(F, path, lines):

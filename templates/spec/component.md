@@ -15,8 +15,9 @@ updated: YYYY-MM-DD
 
 # <ID> SPEC-NN Component <name>
 
-<!-- A new component or a significant change of one: boundaries, responsibilities, interfaces, non-functional needs.
-     Technology choices with long-term consequences are decisions for the lead or architect - mark them [?Q-NNN]. -->
+<!-- A new component or a significant change of one: boundaries, responsibilities, interfaces, non-functional needs,
+     operations. Technology choices with long-term consequences are decisions for the lead or architect - mark them
+     [?Q-NNN]. -->
 
 ## Purpose and boundaries
 
@@ -43,6 +44,12 @@ updated: YYYY-MM-DD
 ## Dependencies
 
 <Other components, external systems, configuration.>
+
+## Operations
+
+<!-- Environments, deployment and scaling expectations, health checks, logs and metrics, who operates it. -->
+
+<...>
 
 ## Acceptance criteria
 

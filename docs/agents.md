@@ -34,12 +34,29 @@ Claude Code's `.claude/settings.json` allows the pipeline scripts and denies edi
 - One skill - one fresh session.
 - Read what it produced. The output is a draft; only what its owner has read goes to review.
 
+## Prompts cheat sheet
+
+| Step | What to say (fresh session each time) |
+|---|---|
+| Intake | "sdd-intake: feature PAY-42, title Refunds, input path/to/brd.md, source BRD v3 from the wiki, owner Anna" |
+| Map | "sdd-map features/PAY-42-refunds" |
+| Approve the map | "I approve the map with one change: merge ui-a and ui-b. Record it in manual.md and rebuild slices." |
+| Domain | "sdd-domain features/PAY-42-refunds service-refunds" |
+| Impact | "sdd-impact features/PAY-42-refunds, the existing code is in ../payments-service" |
+| Contracts | "sdd-contracts features/PAY-42-refunds" |
+| Plan | "sdd-plan features/PAY-42-refunds" |
+| Spec | "sdd-spec features/PAY-42-refunds SPEC-06" |
+| Review | "sdd-review features/PAY-42-refunds SPEC-06" |
+| Answers | "sdd-decide features/PAY-42-refunds: Q-003 - yes, partial refunds are allowed (BA, email 2026-11-05)" |
+| New version | "sdd-update features/PAY-42-refunds, new input source/import/brd-v4.md, BRD v4" |
+| Check | "@sdd-check scope features/PAY-42-refunds, mode report" or "... mode gate ready" |
+
 ## Subagents
 
 | Subagent | Script | Modes | Fixes itself | Returns |
 |---|---|---|---|---|
 | `sdd-check` | `tools/check.py` | `fix`, `report`, `trace`, `gate contracts`, `gate ready`, `regression` | Cyrillic in IDs, dates, case of statuses, template comments, physical data types | what it fixed and what is left, with hints |
-| `sdd-source` | `tools/snapshot.py`, `tools/slices.py` | `snapshot`, `update`, `slices` | nothing by hand | snapshot summary, changes table, slice errors |
+| `sdd-source` | `tools/new_feature.py`, `tools/snapshot.py`, `tools/slices.py` | `new`, `snapshot`, `update`, `slices` | nothing by hand | snapshot summary, changes table, slice errors |
 
 Call manually: "@sdd-check scope features/LIB-1-book-reservations, mode report".
 

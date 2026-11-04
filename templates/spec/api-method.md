@@ -16,9 +16,10 @@ updated: YYYY-MM-DD
 # <ID> SPEC-NN <Add|Change> <METHOD> <path>
 
 <!-- One document - one API method. Purpose and expected data come from the contract card; here the full contract
-     is designed: method, path, request, response, errors, access. Every field, code and path has a source
-     (requirement, decision, source document, code, provider docs) or is an explicit design decision for a new interface.
-     Unknown - [?Q-NNN], never an invented value. mode: change - mark steps [new]/[chg]/[del] and add a Change column. -->
+     is designed: method, path, request, validation, response, every response code, access, non-functional needs.
+     Every field, code and path has a source (requirement, decision, source document, code, provider docs) or is an
+     explicit design decision for a new interface. Unknown - [?Q-NNN], never an invented value.
+     mode: change - mark steps [new]/[chg]/[del] and add a Change column (new/chg/del) to the tables. -->
 
 ## Description
 
@@ -34,35 +35,44 @@ Contract: CON-NNN, version <N>.
 | Method | <GET / POST / PUT / PATCH / DELETE> |
 | Path | `/<path>` |
 | Caller | <screen or component> |
-| Access | <who may call it and what is checked> |
+| Authentication | <how the caller is identified> |
+| Authorization | <who may call it; which objects they may touch (ownership, organization, role)> |
 
 ## Request
 
-<!-- Parameters: path, query, header, body. Full example: the path with sample values; for a body - complete JSON. -->
+<!-- Every parameter: where it goes (path, query, header, body), type, required, constraints (length, format, range,
+     allowed values, default). Nested objects - a Block column with the parent name.
+     Full example: the path with sample values; for a body - complete JSON with every field. -->
 
-| Parameter | In | Type | Required | Description |
-|---|---|---|---|---|
-| `<name>` | path | uuid | yes | <description> |
+| Parameter | In | Type | Required | Constraints | Description |
+|---|---|---|---|---|---|
+| `<name>` | path | uuid | yes | - | <description> |
 
 Example: `GET /<path>/<sample value>`
 
 ## Algorithm
 
-<!-- Plain numbered steps, not a table. Each step says what to do and where every value comes from.
-     Error branches inside the steps: "If ... - stop with error 404". Last line - "Result: ...". -->
+<!-- Plain numbered steps, not a table. Each step says what to do and where every value comes from (table and
+     column, contract, configuration key). Validation of the request goes first. Error branches inside the steps:
+     "If ... - stop with error 404". Every code used here needs a subsection in "Response codes".
+     Last line - "Result: ...". -->
 
-1. <Check access. If ... - stop with error 403.>
-2. <...>
+1. <Check authentication. If ... - stop with error 401.>
+2. <Validate the request by "Request". If invalid - stop with error 400.>
+3. <...>
 
 Result: <what the caller gets>.
 
 ## Response
 
-<!-- Every field: type, description, source. Complete, working example - no "..." except for long values. -->
+<!-- Success status code, then every field: type, required, description with its source. Lists - sorting and
+     pagination. Complete, working example - no "..." except for long values. -->
 
-| Field | Type | Description | Example |
-|---|---|---|---|
-| `<field>` | <type> | <description, source> | <example> |
+Status: <200 / 201 / 204>.
+
+| Field | Type | Required | Description | Example |
+|---|---|---|---|---|
+| `<field>` | <type> | yes | <description, source> | <example> |
 
 ```json
 {
@@ -72,11 +82,13 @@ Result: <what the caller gets>.
 
 ## Response codes
 
-<!-- A subsection per code: when it happens (which step) and the full response body. -->
+<!-- A subsection "### <code> <message>" for every code the method returns: each error the algorithm stops with,
+     and the shared ones (400, 401, 403, 404, 409, 422, 429, 500, 503 - only those that can happen, unless the house
+     rules describe shared codes elsewhere - then link them). Each: when it happens (step) and the full body. -->
 
-### 404 <Message>
+### 400 <Message>
 
-When: <condition, step>.
+When: step <N>, <condition>.
 
 ```json
 {
@@ -84,9 +96,25 @@ When: <condition, step>.
 }
 ```
 
+## Non-functional requirements
+
+<!-- Whatever applies, with sources; otherwise "Not applicable: <why>".
+     Performance (latency, throughput), idempotency and retries of the caller, pagination limits, rate limits,
+     timeouts of calls to other systems, caching, audit and logging (what is logged, personal data masked). -->
+
+<...>
+
+## Compatibility
+
+<!-- mode: new - "Not applicable: new method". mode: change - is the change backward compatible; if not: new version
+     of the path, which consumers must migrate, how long the old version lives. -->
+
+<...>
+
 ## Acceptance criteria
 
-<!-- 3-10 testable statements: condition and observable result, each ending with the requirement it checks. -->
+<!-- 3-10 testable statements: condition and observable result, each ending with the requirement it checks.
+     Cover the success path and every error code. -->
 
 1. <When ..., the method returns ...> (REQ-NNN)
 

@@ -114,6 +114,17 @@ Watch: the reminder has no timing.
 
 - A member sees and changes only their own reservations (source 4) - applies to service-reservations, integration-portal-api, ui-reservations.
 
+## Glossary
+
+| Term | Meaning | Synonyms in the source | In specs |
+|---|---|---|---|
+| Member | a logged-in user of the member portal | user, reader | Member, `member_id` |
+| Title | a book as a catalog entry, not a physical copy | book | Title, `title_id` |
+| Copy | a physical item of a title at a branch | - | only as the availability count |
+| Branch | a library location where the book is picked up | - | Branch, `branch_id` |
+| Reservation | a title held for a member at a branch for 3 days | booking | Reservation, `reservation` |
+| End of a reservation | the moment it stops being active | "valid until", "the date until which the book is held" | `valid_until` |
+
 ## Findings for domains
 
 ### integration-portal-api

@@ -101,6 +101,22 @@ Blocks `### Q-NNN <title>` with bullet fields. Question: `To`, `Where`, `Blocks`
 
 ## Spec units
 
+Default types (`unit_types` in `sdd.config.json`, numbering order):
+
+| Type | One file describes |
+|---|---|
+| `component` | a new component or a significant change of one: boundaries, interfaces, operations |
+| `data-model` | the data model of one component: tables, enumerations, indexes, lifecycle |
+| `integration` | the exchange of our component with one external system |
+| `job` | one background job |
+| `message` | one message, event or queue we own: channel, payload, delivery |
+| `api-method` | one API method: request, algorithm, response, every response code |
+| `scenario` | an end-to-end chain through several components |
+| `ui` | one screen, tab, drawer or dialog |
+| `config` | the configuration a feature adds to one component |
+
+`api-method` and `message` describe exactly one in-scope contract of kind `api` and `message` (`contract_unit_types`).
+
 Required sections of a unit are the `## ` headings of its template `templates/spec/<type>.md`. A section that does not apply stays with "Not applicable: <why>". HTML comments copied from templates are hints and are reported until removed.
 
 ## Checker rule codes
@@ -115,7 +131,8 @@ Output lines look like `E path:line - [code] message`. Groups:
 | `req-*` | requirements and dispositions |
 | `q-*`, `m-*`, `marker-*` | questions, decisions, interventions, markers |
 | `contract-*` | registry and cards, coverage |
-| `plan-*`, `spec-*`, `section`, `placeholder`, `template-comment` | plan and spec units |
-| `dm-*`, `api-*` | data model and API house rules |
+| `plan-*`, `spec-*`, `scenario-coverage`, `section`, `placeholder`, `template-comment` | plan and spec units |
+| `api-codes`, `api-success`, `api-envelope` | every code the algorithm uses is described with a body; the success code is stated; house envelope |
+| `dm-*` | data model columns, logical types, primary keys |
 | `link-*` | references to things that do not exist |
 | `gate` | gate conditions |

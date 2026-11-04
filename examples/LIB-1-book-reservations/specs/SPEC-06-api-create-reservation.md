@@ -31,15 +31,16 @@ Contract: CON-002, version 1.
 | Method | POST |
 | Path | `/reservations` |
 | Caller | Member portal, "Reserve" button (SPEC-10) |
-| Access | Logged-in member; the member ID is taken from the session token (REQ-014) |
+| Authentication | Session token of the member portal in the `Authorization` header |
+| Authorization | Any logged-in member; the reservation is always created for the member of the session (REQ-014, source 4) |
 
 ## Request
 
-| Parameter | In | Type | Required | Description |
-|---|---|---|---|---|
-| `Authorization` | header | string | yes | Session token of the member portal |
-| `titleId` | body | string | yes | Title ID from the catalog widget (Q-003), max 64 |
-| `branchId` | body | string | yes | Branch ID from the catalog widget (Q-003), max 64 |
+| Parameter | In | Type | Required | Constraints | Description |
+|---|---|---|---|---|---|
+| `Authorization` | header | string | yes | `Bearer <token>` | Session token of the member portal |
+| `titleId` | body | string | yes | 1-64 characters | Title ID from the catalog widget (Q-003) |
+| `branchId` | body | string | yes | 1-64 characters | Branch ID from the catalog widget (Q-003) |
 
 Example: `POST /reservations`
 
@@ -66,16 +67,16 @@ The whole algorithm completes within 2 seconds for 95% of requests, including st
 
 ## Response
 
-| Field | Type | Description | Example |
-|---|---|---|---|
-| `id` | uuid | Reservation ID, `reservation.id` | `"0b6f6d1e-5c1a-4d7e-9a43-2f0d3c9b8a10"` |
-| `titleId` | string | `reservation.title_id` | `"T-000417"` |
-| `branchId` | string | `reservation.branch_id` | `"B-07"` |
-| `status` | string | `reservation.status`, always `active` here | `"active"` |
-| `createdAt` | string (date-time) | `reservation.created_at` | `"2026-11-04T10:15:00Z"` |
-| `validUntil` | string (date-time) | `reservation.valid_until`; the page shows it in the success message (REQ-021) | `"2026-11-07T10:15:00Z"` |
+Status: 201.
 
-Status 201.
+| Field | Type | Required | Description | Example |
+|---|---|---|---|---|
+| `id` | uuid | yes | Reservation ID, `reservation.id` | `"0b6f6d1e-5c1a-4d7e-9a43-2f0d3c9b8a10"` |
+| `titleId` | string | yes | `reservation.title_id` | `"T-000417"` |
+| `branchId` | string | yes | `reservation.branch_id` | `"B-07"` |
+| `status` | string | yes | `reservation.status`, always `active` here | `"active"` |
+| `createdAt` | string (date-time) | yes | `reservation.created_at` | `"2026-11-04T10:15:00Z"` |
+| `validUntil` | string (date-time) | yes | `reservation.valid_until`; the page shows it in the success message (REQ-021) | `"2026-11-07T10:15:00Z"` |
 
 ```json
 {
@@ -169,6 +170,17 @@ When: step 5, the catalog does not answer.
   }
 }
 ```
+
+## Non-functional requirements
+
+- Performance: 95% of requests within 2 seconds, including the catalog call (REQ-010); the catalog call timeout is set in SPEC-03.
+- Idempotency: the method is not idempotent; a repeated request after success is answered with 409 `ALREADY_RESERVED` by step 4, so a retry by the portal cannot create a second reservation of the same title.
+- Concurrency: steps 3-6 run in one transaction with a lock on the member's active reservations, so two parallel requests cannot exceed the limit of 3.
+- Audit: step 6 writes the audit record (REQ-009). Logs carry the reservation ID and member ID, no other personal data.
+
+## Compatibility
+
+Not applicable: new method.
 
 ## Acceptance criteria
 

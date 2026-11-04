@@ -23,7 +23,7 @@ flowchart LR
 
 - **A method.** Ten principles with reasons: why the input is never edited, why requirements are split by components instead of document sections, why interfaces are listed before planning, why "I don't know" must be a tracked question. See [docs/concepts.md](docs/concepts.md).
 - **An agent kit.** `AGENTS.md`, ten skills (one per step), two subagents, templates and a complete example. Works with Claude Code, Codex, Kilo Code, OpenCode, and with any agent that can read `AGENTS.md`.
-- **Tools.** Three Python scripts that need only the standard library: `snapshot.py` (numbered snapshot of the input), `slices.py` (per-domain extracts of it), `check.py` (form, links, coverage, gates, traceability). Covered by regression tests.
+- **Tools.** Python scripts that need only the standard library: `new_feature.py` (feature folder from templates), `snapshot.py` (numbered snapshot of the input), `slices.py` (per-domain extracts of it), `check.py` (form, links, coverage, response codes, gates, traceability). Covered by regression tests and run in CI.
 
 What it is not: a converter from Word or wiki pages (bring Markdown, made by any tool you like), a project management system, or a code generator. It stops at approved specs; tasks, code and tests are built from them by your own process.
 
@@ -86,4 +86,4 @@ Python 3.8+ (standard library only), git, an agent tool. Tested on Windows and L
 
 ## License
 
-[MIT](LICENSE).
+Public domain ([Unlicense](LICENSE)): take it, change it, use it for anything, no attribution needed.

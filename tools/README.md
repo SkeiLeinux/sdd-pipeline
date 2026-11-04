@@ -3,6 +3,7 @@
 Python 3.8+, standard library only. Run from the repository root. Agents run them through the subagents `sdd-source` and `sdd-check`; people can run them directly.
 
 ```
+python tools/new_feature.py <ID> <slug> --title "..." [--owner "..."] [--source "..."] [--input <file.md>]
 python tools/snapshot.py <input.md> features/<ID>-<slug>/source [--number] [--force] [--origin "..."]
 python tools/slices.py features/<ID>-<slug> [--domain <name>] [--check]
 python tools/check.py [features/<ID>-<slug> | files...] [--gate contracts|ready] [--trace] [--next]
@@ -12,6 +13,7 @@ python -m unittest discover -s tools/tests
 
 | Script | What it does |
 |---|---|
+| `new_feature.py` | creates `features/<ID>-<slug>/` with the passport, empty decisions and `source/import/` |
 | `snapshot.py` | immutable numbered snapshot of a Markdown document, section index with checksums; with `--force` - `changes.md` against the previous snapshot |
 | `slices.py` | per-domain slices of the snapshot from the Read lists of `analysis.md` |
 | `check.py` | form, references, coverage, gates, traceability matrix, next free IDs |

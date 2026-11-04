@@ -34,12 +34,29 @@
 - Один скилл - одна новая сессия.
 - Читайте результат. Это черновик; на ревью уходит только то, что прочитал владелец.
 
+## Шпаргалка запросов
+
+| Шаг | Что сказать (каждый раз в новой сессии) |
+|---|---|
+| Прием | "sdd-intake: задача PAY-42, название Refunds, вход path/to/brd.md, источник BRD v3 из вики, владелец Анна" |
+| Карта | "sdd-map features/PAY-42-refunds" |
+| Утверждение карты | "Утверждаю карту с одной правкой: объединить ui-a и ui-b. Запиши в manual.md и пересобери срезы." |
+| Домен | "sdd-domain features/PAY-42-refunds service-refunds" |
+| Влияние | "sdd-impact features/PAY-42-refunds, существующий код в ../payments-service" |
+| Контракты | "sdd-contracts features/PAY-42-refunds" |
+| План | "sdd-plan features/PAY-42-refunds" |
+| Спецификация | "sdd-spec features/PAY-42-refunds SPEC-06" |
+| Ревью | "sdd-review features/PAY-42-refunds SPEC-06" |
+| Ответы | "sdd-decide features/PAY-42-refunds: Q-003 - да, частичный возврат разрешен (BA, письмо 2026-11-05)" |
+| Новая версия | "sdd-update features/PAY-42-refunds, новый вход source/import/brd-v4.md, BRD v4" |
+| Проверка | "@sdd-check scope features/PAY-42-refunds, mode report" или "... mode gate ready" |
+
 ## Субагенты
 
 | Субагент | Скрипт | Режимы | Исправляет сам | Возвращает |
 |---|---|---|---|---|
 | `sdd-check` | `tools/check.py` | `fix`, `report`, `trace`, `gate contracts`, `gate ready`, `regression` | кириллицу в ID, даты, регистр статусов, комментарии шаблона, физические типы данных | что исправил и что осталось, с подсказками |
-| `sdd-source` | `tools/snapshot.py`, `tools/slices.py` | `snapshot`, `update`, `slices` | ничего руками | сводку снимка, таблицу изменений, ошибки срезов |
+| `sdd-source` | `tools/new_feature.py`, `tools/snapshot.py`, `tools/slices.py` | `new`, `snapshot`, `update`, `slices` | ничего руками | сводку снимка, таблицу изменений, ошибки срезов |
 
 Вызов вручную: "@sdd-check scope features/LIB-1-book-reservations, mode report".
 

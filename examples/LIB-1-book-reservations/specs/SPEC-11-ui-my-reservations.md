@@ -42,6 +42,11 @@ A new item "My reservations" in the member portal menu (REQ-024). Only a logged-
 | "Cancel" | REQ-025, REQ-007 | CON-004 | shown only in rows with status "Active"; after success the row shows "Cancelled" |
 | Empty state | REQ-026 | CON-003 | shown instead of the table when the list is empty |
 
+## Navigation and dialogs
+
+- "Cancel" stays on the page; the row is updated in place. The source defines no confirmation before cancelling [?Q-007].
+- A row is not a link: the source defines no reservation details page.
+
 ## States and messages
 
 - Loading: the table area shows the portal's standard loader.

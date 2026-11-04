@@ -18,9 +18,10 @@ DEFAULT_CONFIG = {
     "scope": {"in": "in", "out": "out"},
     "requirement_types": ["FR", "NFR", "BR", "IR"],
     "ui_domain_prefix": "ui-",
-    "unit_types": ["component", "data-model", "integration", "job", "api-method", "scenario", "ui", "config"],
+    "unit_types": ["component", "data-model", "integration", "job", "message", "api-method", "scenario", "ui", "config"],
     "api_unit_type": "api-method",
     "data_model_unit_type": "data-model",
+    "contract_unit_types": {"api-method": "api", "message": "message"},
     "contract_kinds": ["api", "message", "file", "other"],
     "contract_modes": ["new", "change", "reuse", "external"],
     "api_response_required_keys": [],
@@ -32,6 +33,9 @@ DEFAULT_CONFIG = {
     },
     "style": {"forbidden_chars": {}, "forbidden_words": {}},
 }
+
+# Settings whose dicts are merged key by key with the defaults; other keys are replaced as a whole.
+MERGED_KEYS = ("scope", "data_model", "style")
 
 STAGES = ["intake", "analysis", "contracts", "plan", "spec", "ready"]
 FEATURE_STATUSES = STAGES + ["hold", "cancelled"]
@@ -60,7 +64,7 @@ def load_config(root=ROOT):
         for key, value in user.items():
             if key.startswith("_"):
                 continue
-            if isinstance(value, dict) and isinstance(cfg.get(key), dict):
+            if key in MERGED_KEYS and isinstance(value, dict) and isinstance(cfg.get(key), dict):
                 cfg[key].update(value)
             else:
                 cfg[key] = value
@@ -170,10 +174,12 @@ def html_comments(lines):
 
 
 def headings(lines, cmask=None):
+    """Headings outside fenced code and HTML comments (hints in comments are not structure)."""
     cmask = cmask or code_mask(lines)
+    hmask = comment_mask(lines, cmask)
     out = []
     for i, line in enumerate(lines):
-        if cmask[i]:
+        if cmask[i] or hmask[i]:
             continue
         m = ANY_HEADING.match(line)
         if m:
@@ -224,13 +230,15 @@ def split_row(line):
 def tables(lines, begin=0, end=None, cmask=None):
     """Markdown tables in range: dicts with line, header, rows [(line, cells)]."""
     cmask = cmask or code_mask(lines)
+    hmask = comment_mask(lines, cmask)
+    skip = [a or b for a, b in zip(cmask, hmask)]
     end = len(lines) if end is None else end
     res = []
     i = begin
     while i < end:
-        if not cmask[i] and lines[i].lstrip().startswith("|"):
+        if not skip[i] and lines[i].lstrip().startswith("|"):
             j = i
-            while j < end and not cmask[j] and lines[j].lstrip().startswith("|"):
+            while j < end and not skip[j] and lines[j].lstrip().startswith("|"):
                 j += 1
             if j - i >= 2 and re.match(r"^\|?\s*:?-{2,}", lines[i + 1].strip()):
                 res.append({
@@ -260,6 +268,38 @@ def ids_in(text, kind):
 
 def strip_inline_code(line):
     return re.sub(r"`[^`]*`", "", line)
+
+
+# ---------------------------------------------------------------- relative links
+
+INLINE_LINK = re.compile(r"(!?\[[^\]]*\]\()(<[^>]+>|[^)\s]+)((?:\s+\"[^\"]*\")?\))")
+REF_LINK = re.compile(r"^(\s*\[[^\]]+\]:\s*)(\S+)(.*)$")
+
+
+def is_relative_target(target):
+    t = target.strip("<>")
+    return bool(t) and not re.match(r"^(?:[a-z][a-z0-9+.-]*:|#|/)", t, re.I)
+
+
+def rewrite_links(line, fix):
+    """Apply fix(target) to every relative link or image target in a line of Markdown."""
+    def inline(m):
+        t = m.group(2)
+        if not is_relative_target(t):
+            return m.group(0)
+        bracket = t.startswith("<")
+        new = fix(t.strip("<>"))
+        return m.group(1) + ("<%s>" % new if bracket else new) + m.group(3)
+    line = INLINE_LINK.sub(inline, line)
+    m = REF_LINK.match(line)
+    if m and is_relative_target(m.group(2)):
+        line = m.group(1) + fix(m.group(2).strip("<>")) + m.group(3)
+    return line
+
+
+def rewrite_block(lines, fix):
+    cm = code_mask(lines)
+    return [l if cm[i] else rewrite_links(l, fix) for i, l in enumerate(lines)]
 
 
 # ---------------------------------------------------------------- source snapshot
@@ -453,7 +493,8 @@ def build_slice(feature_id, domain, items, src_lines, secs):
     out.append("")
     for s in secs:
         if s["num"] in picked:
-            chunk = src_lines[s["start"]:s["end"]]
+            # The slice lives one folder deeper (source/domains/) than the snapshot (source/).
+            chunk = rewrite_block(src_lines[s["start"]:s["end"]], lambda t: "../" + t)
             while chunk and not chunk[-1].strip():
                 chunk = chunk[:-1]
             out.extend(chunk)

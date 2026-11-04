@@ -198,6 +198,15 @@ def main(argv=None):
         return 2
 
     lines = sddlib.read_lines(args.input)
+    in_dir = os.path.dirname(os.path.abspath(args.input))
+
+    def relink(target):
+        # Links and images of the input are relative to the input file; the snapshot lives in OUT.
+        path, sep, anchor = target.partition("#")
+        new = os.path.relpath(os.path.normpath(os.path.join(in_dir, path)), out).replace("\\", "/")
+        return new + sep + anchor
+
+    lines = sddlib.rewrite_block(lines, relink)
     body, doc_title, errors, warnings = build(lines, args.number, args.title)
     if errors:
         for e in errors:

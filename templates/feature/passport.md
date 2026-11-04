@@ -48,13 +48,16 @@ Assumptions:
 
 <!-- Filled by sdd-plan after the contract registry. One row - one spec unit. Tables grouped by domains of the map:
      "### <domain> - <summary>"; scenario units - group "### Scenarios".
-     Numbering follows unit_types order in sdd.config.json. Contracts - CON IDs or "-". -->
+     Numbering follows unit_types order in sdd.config.json. Contracts - CON IDs or "-". Group format:
 
 ### <domain> - <summary>
 
 | Spec | Type | Title | Component | Requirements | Contracts | Status |
 |---|---|---|---|---|---|---|
 | [SPEC-01](specs/SPEC-01-<slug>.md) | component | <title> | <component> | REQ-001 | - | draft |
+-->
+
+Not planned yet.
 
 ## History
 

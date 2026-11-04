@@ -13,8 +13,9 @@ The pipeline is meant to be adopted, not used as is. Most adaptations are settin
 | `scope` | `{"in": "in", "out": "out"}` | labels of the Scope column, e.g. `{"in": "ours", "out": "external"}` |
 | `requirement_types` | `FR`, `NFR`, `BR`, `IR` | allowed requirement types |
 | `ui_domain_prefix` | `ui-` | domains with this prefix need a "Screen fields" table |
-| `unit_types` | eight types | spec unit types in numbering order; each needs a template |
-| `api_unit_type`, `data_model_unit_type` | `api-method`, `data-model` | which types get API and data model rules |
+| `unit_types` | nine types | spec unit types in numbering order; each needs a template |
+| `api_unit_type`, `data_model_unit_type` | `api-method`, `data-model` | which types get API checks (response codes, envelope) and data model checks |
+| `contract_unit_types` | `{"api-method": "api", "message": "message"}` | unit types that must describe exactly one in-scope contract of the given kind |
 | `contract_kinds`, `contract_modes` | `api, message, file, other`; `new, change, reuse, external` | allowed values in contracts |
 | `api_response_required_keys` | `[]` | keys every API response example must contain - your response envelope, e.g. `["data", "error"]` |
 | `data_model` | `Name, Type, Comment, Constraint`, logical types | columns and types of data model tables |
@@ -37,8 +38,9 @@ Set `artifact_language` (for example `ru`). Agents then write requirements, ques
 
 1. Add the type to `unit_types` (its position sets the numbering order).
 2. Create `templates/spec/<type>.md`. Its `## ` headings become the required sections of every unit of that type.
-3. Add a slicing rule to `.agents/skills/sdd-plan/SKILL.md` and, if the type has special rules, to `sdd-spec` and `sdd-review`.
-4. Run `python tools/sync_agents.py`.
+3. If one unit of the type describes exactly one contract (like `api-method`), add it to `contract_unit_types`.
+4. Add a slicing rule to `.agents/skills/sdd-plan/SKILL.md` and, if the type has special rules, to `sdd-spec` and `sdd-review`.
+5. Run `python tools/sync_agents.py`.
 
 ## House rules for APIs and data
 

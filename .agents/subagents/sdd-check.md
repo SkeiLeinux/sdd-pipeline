@@ -49,7 +49,9 @@ Everything else - report with a hint for the main agent:
 | `link-*` | create what is missing or fix the reference; `link-spec` for planned but unwritten specs is normal before the gate |
 | `domain-*` | align `analysis.md` with requirement files and slices; stale slices - subagent `sdd-source`, mode `slices` |
 | `contract-*`, `plan-*`, `spec-plan` | align the registry, cards, plan and spec headers; cover requirements |
-| `api-envelope`, `dm-cols` | bring the example or table to the house rule from `sdd.config.json` |
+| `api-codes`, `api-success` | add a subsection "### <code> <message>" with condition and full body for every code the algorithm uses; state the success code in "Response" |
+| `api-envelope`, `dm-cols`, `dm-pk` | bring the example or table to the house rule from `sdd.config.json`; give every table a primary key |
+| `scenario-coverage` | fill "Plan coverage" of the scenario in `analysis.md` with planned SPEC IDs |
 | `gate` | owner's decision: approvals, answers to blocking questions |
 
 ## Order

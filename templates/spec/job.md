@@ -15,7 +15,7 @@ updated: YYYY-MM-DD
 
 # <ID> SPEC-NN Background job <name>
 
-<!-- One document - one background job: what starts it, what it does step by step, how it fails. -->
+<!-- One document - one background job: what starts it, what it does step by step, how it fails and recovers. -->
 
 ## Purpose
 
@@ -23,15 +23,23 @@ updated: YYYY-MM-DD
 
 ## Trigger and schedule
 
-<Schedule or event, overlap rule (may two runs overlap?), manual start.>
+<Schedule (with time zone) or event; manual start; what happens to a run missed during downtime.>
 
 ## Algorithm
 
-<!-- Plain numbered steps; the source of every value; error branches inside steps; last line "Result: ...". -->
+<!-- Plain numbered steps; the source of every value; error branches inside steps; batching for large volumes;
+     last line "Result: ...". -->
 
 1. <...>
 
 Result: <...>.
+
+## Concurrency and restart
+
+<!-- May two runs overlap, and how it is prevented with several instances (lock, single leader). Is a rerun safe
+     (idempotent)? What happens to a run interrupted halfway. -->
+
+<...>
 
 ## Configuration
 
@@ -41,11 +49,11 @@ Result: <...>.
 
 ## Errors and retries
 
-<What happens on failure of each step; retries; partial results.>
+<What happens on failure of each step; retries; partial results; who is told.>
 
 ## Observability
 
-<Logs, metrics, alerts an operator needs.>
+<Logs, metrics (processed, failed, duration), alerts an operator needs.>
 
 ## Acceptance criteria
 
