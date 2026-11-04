@@ -1,0 +1,121 @@
+# Артефакты: файлы, ID, статусы, форматы
+
+[English version](artifacts.md)
+
+## Папка задачи
+
+```
+features/<ID>-<slug>/
+  README.md                    паспорт и план спецификаций
+  source/import/               сырой вход как получен (не проверяется)
+  source/source.md             неизменяемый нумерованный снимок
+  source/index.md              разделы с диапазонами строк и контрольными суммами
+  source/changes.md            что изменила новая версия (после обновления)
+  source/domains/<домен>.md    сгенерированные срезы
+  analysis.md                  карта доменов, сценарии, указатель разделов, влияние, риски
+  requirements/README.md       указатель файлов доменов
+  requirements/<домен>.md      требования одного домена
+  requirements/dispositions.md исключенные и замененные требования
+  decisions/questions.md       открытые, отвеченные, отложенные вопросы
+  decisions/decisions.md       решения (только дополняется)
+  decisions/manual.md          ручные вмешательства (только дополняется)
+  contracts/README.md          реестр контрактов
+  contracts/CON-NNN-<slug>.md  карточки контрактов
+  specs/SPEC-NN-<slug>.md      единицы спецификаций
+  traceability.md              сгенерированная матрица
+```
+
+Папка называется `<ID>` или `<ID>-<slug>`; ID соответствует `feature_id_pattern` в `sdd.config.json` (удобно брать ключ из трекера: `PAY-42`). Имена файлов - латиница, kebab-case.
+
+## Идентификаторы
+
+| Сущность | Формат | Уникален в пределах |
+|---|---|---|
+| Задача | по `feature_id_pattern`, например `LIB-1` | репозитория |
+| Домен | kebab-case, например `service-reservations`, `ui-reservations`, `integration-catalog` | задачи |
+| Требование | `REQ-NNN` | задачи |
+| Вопрос / решение | `Q-NNN` (решение сохраняет ID своего вопроса) | задачи |
+| Ручное вмешательство | `M-NNN` | задачи |
+| Контракт | `CON-NNN` | задачи |
+| Единица спецификации | `SPEC-NN` | задачи |
+
+ID только латиницей (скрипт ловит кириллических двойников вроде `RЕQ` с кириллической `Е`). ID не переиспользуются: исключенное требование остается в своем файле и получает строку в `dispositions.md`. Извне задачи - полная форма `LIB-1/REQ-012`.
+
+## Шапка (frontmatter)
+
+Каждый файл начинается с `--- ... ---`: только `ключ: значение` и списки `[a, b]`.
+
+| type | Обязательные ключи |
+|---|---|
+| `feature` (паспорт) | `id`, `title`, `status`, `source`, `owner`, `updated` |
+| `analysis`, `requirements` | `feature`, `status`, `updated` (+ `domain` у требований) |
+| `questions`, `decisions`, `manual` | `feature`, `updated` |
+| `contracts` (реестр) | `feature`, `status`, `version`, `owner`, `updated` |
+| `contract` (карточка) | `id`, `title`, `feature`, `domain`, `kind`, `provider`, `consumers`, `scope`, `mode`, `status`, `version`, `requirements`, `updated` |
+| единица спецификации (`type` = тип единицы) | `id`, `type`, `title`, `feature`, `component`, `mode`, `status`, `version`, `requirements`, `contracts`, `depends`, `updated` |
+
+## Статусы
+
+| Артефакт | Статусы |
+|---|---|
+| Задача | `intake`, `analysis`, `contracts`, `plan`, `spec`, `ready`; `hold`, `cancelled` |
+| Реестр и карточки контрактов | `draft`, `review`, `approved` |
+| Единица спецификации | `draft`, `review`, `approved`, `superseded` |
+| Вопрос | `open`, `answered` (еще не применен), `deferred` |
+| Решение | `active`, `superseded by Q-NNN` |
+| Ручное вмешательство (Type) | `decision`, `edit`, `approval`, `rejection` |
+
+Согласованная спецификация меняется только новой версией: `version + 1`, статус `review`, строка в "History".
+
+## Требования
+
+Семь колонок: `ID | Requirement | Source | Scenario | Type | Scope | Note`.
+
+- Source - номера разделов снимка через запятую; обязательно.
+- Type - из `requirement_types` (по умолчанию `FR`, `NFR`, `BR`, `IR`).
+- Scope - метки `scope.in` или `scope.out` из настроек.
+- Note - ссылки на решения `(Q-NNN)`, маркеры `[?Q-NNN]` или `-`.
+
+`dispositions.md`: `Requirement | State | Reason | Decision | Replacement`, состояние `excluded` или `superseded`.
+
+## Формат карты доменов
+
+Заголовки `analysis.md` читают скрипты - оставляйте их как в шаблоне. Части со строгим форматом:
+
+- **Domains** - таблица `Domain | Kind | Component | Summary | Questions`, Kind - `node` или `edge`.
+- **Source slices** - подраздел `### <домен> - <суть>` на каждый домен со строкой `Read:` и пунктами `- <ссылки> - <что искать>.` Ссылки: `N` - раздел N с подразделами; `N-M` - от N до конца M; `N (intro)` - только текст N до его подразделов; несколько - через `, `.
+- **Sections by domain** - таблица `Section | Domains | Notes`; первая ячейка начинается с номера раздела; домены через запятую, `all` или `-`.
+- **Findings for domains** - подразделы по доменам с пунктами; `- Applied <дата> in <файл>` отмечает, что находки учтены.
+
+## Вопросы, решения, вмешательства
+
+Блоки `### Q-NNN <заголовок>` с полями-пунктами. Вопрос: `To`, `Where`, `Blocks`, `Status`, `Sent`, `Question`, `Proposal`, `Answer`. Решение: `Status`, `Kind` (`business`, `technical`, `external`), `Question`, `Decision`, `Why`, `Decided`, `Affects`, `Where`. Вмешательство `### M-NNN`: `Type`, `What`, `Who and when`, `Basis`, `Affects`.
+
+## Маркеры
+
+| Маркер | Значение |
+|---|---|
+| `[?Q-NNN]` | здесь неизвестно, см. открытый вопрос; в согласованных спецификациях запрещен |
+| `(Q-NNN)` | следует из решения |
+| `[new]`, `[chg]`, `[del]` | в спецификациях `mode: change` - новый, измененный, удаляемый шаг или строка |
+
+## Единицы спецификаций
+
+Обязательные разделы единицы - заголовки `## ` ее шаблона `templates/spec/<тип>.md`. Неприменимый раздел остается с текстом "Not applicable: <почему>". HTML-комментарии из шаблона - подсказки; пока их не удалили, скрипт о них сообщает.
+
+## Коды правил проверки
+
+Строки вывода выглядят как `E путь:строка - [код] сообщение`. Группы:
+
+| Префикс | Что проверяет |
+|---|---|
+| `fm-*` | шапки, имена файлов, статусы |
+| `id-cyrillic`, `style-*` | ID и стиль команды |
+| `source-*`, `domain-*` | снимок, карта доменов, срезы, указатель разделов, находки, поля экранов UI |
+| `req-*` | требования и их состояния |
+| `q-*`, `m-*`, `marker-*` | вопросы, решения, вмешательства, маркеры |
+| `contract-*` | реестр, карточки, покрытие |
+| `plan-*`, `spec-*`, `section`, `placeholder`, `template-comment` | план и единицы спецификаций |
+| `dm-*`, `api-*` | правила команды для моделей данных и API |
+| `link-*` | ссылки на несуществующее |
+| `gate` | условия ворот |

@@ -1,0 +1,41 @@
+{
+  "_comment": "Project settings read by tools/check.py and by the agent skills. Keys starting with '_' are comments. See docs/customization.md.",
+
+  "artifact_language": "en",
+  "_artifact_language": "Language of the prose agents write in artifacts (requirements, questions, specs). Structural labels (headings, frontmatter keys, statuses, field names) stay English so the checker can read them.",
+
+  "feature_id_pattern": "^[A-Z][A-Z0-9]*-[0-9]+$",
+  "_feature_id_pattern": "Feature IDs, e.g. a tracker key: PAY-42, LIB-1.",
+
+  "scope": {"in": "in", "out": "out"},
+  "_scope": "Labels of the Scope column. 'in' - we write specs for it; 'out' - requirements to systems owned by others, kept for traceability only.",
+
+  "requirement_types": ["FR", "NFR", "BR", "IR"],
+  "_requirement_types": "FR - functional, NFR - non-functional, BR - business rule, IR - integration.",
+
+  "ui_domain_prefix": "ui-",
+
+  "unit_types": ["component", "data-model", "integration", "job", "api-method", "scenario", "ui", "config"],
+  "_unit_types": "Spec unit types in numbering order. Each type needs templates/spec/<type>.md; its '## ' headings are the required sections.",
+
+  "api_unit_type": "api-method",
+  "data_model_unit_type": "data-model",
+
+  "contract_kinds": ["api", "message", "file", "other"],
+  "contract_modes": ["new", "change", "reuse", "external"],
+
+  "api_response_required_keys": [],
+  "_api_response_required_keys": "Top-level keys every JSON response example of an api-method must contain, e.g. [\"data\", \"error\"] for a house response envelope. Empty - no check.",
+
+  "data_model": {
+    "columns": ["Name", "Type", "Comment", "Constraint"],
+    "change_column": "Change",
+    "types": ["uuid", "string", "text", "int", "bigint", "decimal", "boolean", "date", "date-time", "time", "json", "binary", "enum"]
+  },
+
+  "style": {
+    "forbidden_chars": {},
+    "forbidden_words": {},
+    "_style": "Optional house style, reported as warnings. Example: {\"forbidden_chars\": {\"\\u2014\": \"use '-'\"}, \"forbidden_words\": {\"customer\": \"say 'user'\"}}"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python tools/check.py:*)",
+      "Bash(python tools/snapshot.py:*)",
+      "Bash(python tools/slices.py:*)",
+      "Bash(python tools/sync_agents.py:*)",
+      "Bash(python -m unittest discover -s tools/tests:*)"
+    ],
+    "deny": [
+      "Edit(features/*/source/**)",
+      "Write(features/*/source/source.md)",
+      "Write(features/*/source/index.md)"
+    ]
+  }
+}
